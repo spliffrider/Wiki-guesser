@@ -86,6 +86,21 @@ export function GameBoard({
                     <button onClick={onPlayAgain} className={styles.playAgainButton}>
                         Play Again
                     </button>
+
+                    <div className={styles.dedicationBox}>
+                        <p className={styles.dedicationText}>
+                            This game was made out of love for Wikipedia, and in dedication to the people
+                            that support it and make it better every day. Please support Wikipedia.
+                        </p>
+                        <a
+                            href="https://wikimediafoundation.org/give/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.donateButton}
+                        >
+                            ❤️ Donate to Wikipedia
+                        </a>
+                    </div>
                 </div>
             </div>
         );
