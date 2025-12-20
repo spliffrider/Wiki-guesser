@@ -16,6 +16,16 @@ import { calculateScore } from '@/lib/scoring';
 
 const DEFAULT_TOTAL_ROUNDS = 5;
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
 interface UseGameReturn {
     state: GameState;
     isLoading: boolean;
@@ -116,25 +126,43 @@ export function useGame(): UseGameReturn {
         setError(null);
 
         try {
-            // Fetch random topics
-            const topics = await getRandomTopics(DEFAULT_TOTAL_ROUNDS + 2);
+            // Fetch extra topics for wrong answer options (4 options per round = 3 wrong per round)
+            const totalTopicsNeeded = DEFAULT_TOTAL_ROUNDS * 4; // 4 options per round
+            const topics = await getRandomTopics(totalTopicsNeeded + 5); // extra buffer
 
-            if (topics.length < DEFAULT_TOTAL_ROUNDS) {
+            if (topics.length < totalTopicsNeeded) {
                 throw new Error('Could not fetch enough topics. Please try again.');
             }
 
-            // Create rounds
-            const rounds: Round[] = topics.slice(0, DEFAULT_TOTAL_ROUNDS).map((topic, index) => ({
-                roundNumber: index + 1,
-                topic,
-                timeLimit: DIFFICULTY_CONFIG[difficulty].timeLimit,
-                startedAt: null,
-                endedAt: null,
-                guess: null,
-                isCorrect: null,
-                timeTakenMs: null,
-                pointsEarned: 0,
-            }));
+            // Split topics: first N for correct answers, rest for wrong options pool
+            const correctTopics = topics.slice(0, DEFAULT_TOTAL_ROUNDS);
+            const wrongOptionsPool = topics.slice(DEFAULT_TOTAL_ROUNDS);
+
+            // Create rounds with shuffled options
+            const rounds: Round[] = correctTopics.map((topic, index) => {
+                // Get 3 wrong options from the pool (unique per round)
+                const wrongStartIndex = index * 3;
+                const wrongOptions = wrongOptionsPool
+                    .slice(wrongStartIndex, wrongStartIndex + 3)
+                    .map(t => t.title);
+
+                // Combine correct + wrong and shuffle
+                const allOptions = [topic.title, ...wrongOptions];
+                const shuffledOptions = shuffleArray(allOptions);
+
+                return {
+                    roundNumber: index + 1,
+                    topic,
+                    options: shuffledOptions,
+                    timeLimit: DIFFICULTY_CONFIG[difficulty].timeLimit,
+                    startedAt: null,
+                    endedAt: null,
+                    guess: null,
+                    isCorrect: null,
+                    timeTakenMs: null,
+                    pointsEarned: 0,
+                };
+            });
 
             // Start first round
             roundStartTimeRef.current = Date.now();

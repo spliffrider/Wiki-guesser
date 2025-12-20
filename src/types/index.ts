@@ -16,6 +16,7 @@ export interface WikiTopic {
 export interface Round {
     roundNumber: number;
     topic: WikiTopic;
+    options: string[];  // Multiple choice options (shuffled, includes correct answer)
     timeLimit: number; // seconds
     startedAt: number | null;
     endedAt: number | null;

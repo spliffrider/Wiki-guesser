@@ -95,6 +95,7 @@ function SinglePlayerGame() {
             <main className={styles.main}>
                 <GameBoard
                     topic={currentTopic}
+                    options={state.rounds[state.currentRound]?.options || []}
                     difficulty={state.difficulty}
                     phase={state.phase as 'playing' | 'between-rounds' | 'finished'}
                     currentRound={state.currentRound}

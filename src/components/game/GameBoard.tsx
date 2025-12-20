@@ -5,13 +5,14 @@
 import { WikiTopic, Difficulty, DIFFICULTY_CONFIG } from '@/types';
 import { redactExcerpt } from '@/lib/wikipedia';
 import { Timer } from './Timer';
-import { GuessInput } from './GuessInput';
+import { MultipleChoice } from './MultipleChoice';
 import { ScoreDisplay } from './ScoreDisplay';
 import { RoundResult } from './RoundResult';
 import styles from './GameBoard.module.css';
 
 interface GameBoardProps {
     topic: WikiTopic | null;
+    options: string[];  // Multiple choice options
     difficulty: Difficulty;
     phase: 'playing' | 'between-rounds' | 'finished';
     currentRound: number;
@@ -39,6 +40,7 @@ interface GameBoardProps {
 
 export function GameBoard({
     topic,
+    options,
     difficulty,
     phase,
     currentRound,
@@ -190,7 +192,11 @@ export function GameBoard({
             </div>
 
             <div className={styles.inputSection}>
-                <GuessInput onSubmit={onSubmitGuess} />
+                <MultipleChoice
+                    options={options}
+                    correctAnswer={topic.title}
+                    onSelect={onSubmitGuess}
+                />
             </div>
         </div>
     );
