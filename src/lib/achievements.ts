@@ -1,6 +1,7 @@
 // Wiki Guesser - Achievements System
 
 import { getSupabaseClient } from './supabase';
+import { calculateLevel } from './levels';
 
 // Achievement definitions
 export interface Achievement {
@@ -11,6 +12,7 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
+    // Game achievements
     { id: 'first_win', name: 'First Blood', description: 'Get your first correct answer', icon: '🎯' },
     { id: 'perfect_game', name: 'Perfect Game', description: 'Get all 5 answers correct in one game', icon: '⭐' },
     { id: 'speed_demon', name: 'Speed Demon', description: 'Answer correctly in under 5 seconds', icon: '⚡' },
@@ -20,6 +22,12 @@ export const ACHIEVEMENTS: Achievement[] = [
     { id: 'games_50', name: 'Dedicated', description: 'Play 50 games', icon: '🏆' },
     { id: 'score_1000', name: 'Rising Star', description: 'Reach 1,000 total points', icon: '💎' },
     { id: 'score_10000', name: 'Champion', description: 'Reach 10,000 total points', icon: '👑' },
+    // Level achievements
+    { id: 'level_5', name: 'Rookie', description: 'Reach Level 5', icon: '🌱' },
+    { id: 'level_10', name: 'Apprentice', description: 'Reach Level 10', icon: '📚' },
+    { id: 'level_20', name: 'Scholar', description: 'Reach Level 20', icon: '🎓' },
+    { id: 'level_30', name: 'Master', description: 'Reach Level 30', icon: '🧙' },
+    { id: 'level_50', name: 'Legend', description: 'Reach Level 50', icon: '👑' },
 ];
 
 export interface UnlockedAchievement {
@@ -82,6 +90,7 @@ export async function checkAndUnlockAchievements(
         gamesPlayed: number;
         totalScore: number;
         longestStreak: number;
+        xp: number;
     }
 ): Promise<string[]> {
     const newlyUnlocked: string[] = [];
@@ -90,8 +99,12 @@ export async function checkAndUnlockAchievements(
     const existing = await getUserAchievements(userId);
     const unlockedIds = new Set(existing.map(a => a.achievement_id));
 
+    // Calculate current level from XP
+    const currentLevel = calculateLevel(profileStats.xp);
+
     // Check each achievement
     const checks: { id: string; condition: boolean }[] = [
+        // Game achievements
         { id: 'first_win', condition: gameStats.correctCount >= 1 },
         { id: 'perfect_game', condition: gameStats.correctCount === gameStats.totalRounds },
         { id: 'speed_demon', condition: gameStats.fastestAnswerMs !== null && gameStats.fastestAnswerMs < 5000 },
@@ -101,6 +114,12 @@ export async function checkAndUnlockAchievements(
         { id: 'games_50', condition: profileStats.gamesPlayed >= 50 },
         { id: 'score_1000', condition: profileStats.totalScore >= 1000 },
         { id: 'score_10000', condition: profileStats.totalScore >= 10000 },
+        // Level achievements
+        { id: 'level_5', condition: currentLevel >= 5 },
+        { id: 'level_10', condition: currentLevel >= 10 },
+        { id: 'level_20', condition: currentLevel >= 20 },
+        { id: 'level_30', condition: currentLevel >= 30 },
+        { id: 'level_50', condition: currentLevel >= 50 },
     ];
 
     for (const check of checks) {

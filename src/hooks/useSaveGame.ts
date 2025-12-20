@@ -67,6 +67,7 @@ export function useSaveGame() {
                     gamesPlayed: updatedProfile.games_played,
                     totalScore: updatedProfile.total_score,
                     longestStreak: updatedProfile.longest_streak,
+                    xp: updatedProfile.total_score, // XP = total score
                 }
             );
 

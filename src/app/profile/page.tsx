@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGameHistory } from '@/lib/database';
 import { getUserAchievements, ACHIEVEMENTS, UnlockedAchievement } from '@/lib/achievements';
+import { calculateLevel, getLevelProgress, getLevelBadge, getXpForLevel } from '@/lib/levels';
 import { Game } from '@/types/database';
 import { Header } from '@/components/layout/Header';
 import styles from './page.module.css';
@@ -55,6 +56,13 @@ export default function ProfilePage() {
 
     const unlockedIds = new Set(achievements.map(a => a.achievement_id));
 
+    // Level calculations (XP = total_score)
+    const xp = profile.total_score;
+    const level = calculateLevel(xp);
+    const levelProgress = getLevelProgress(xp);
+    const levelBadge = getLevelBadge(level);
+    const nextLevelXp = getXpForLevel(level + 1);
+
     return (
         <div className={styles.container}>
             <Header />
@@ -66,7 +74,14 @@ export default function ProfilePage() {
                     </div>
                     <div className={styles.profileInfo}>
                         <h1 className={styles.username}>{profile.username || 'Anonymous'}</h1>
-                        <p className={styles.email}>{user.email}</p>
+                        <div className={styles.levelDisplay}>
+                            <span className={styles.levelBadge}>{levelBadge}</span>
+                            <span className={styles.levelText}>Level {level}</span>
+                        </div>
+                        <div className={styles.xpBar}>
+                            <div className={styles.xpProgress} style={{ width: `${levelProgress}%` }}></div>
+                        </div>
+                        <span className={styles.xpText}>{xp.toLocaleString()} / {nextLevelXp.toLocaleString()} XP</span>
                     </div>
                 </div>
 
@@ -156,8 +171,8 @@ export default function ProfilePage() {
                         Play Again
                     </Link>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }
 
