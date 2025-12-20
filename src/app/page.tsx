@@ -1,0 +1,78 @@
+// Wiki Guesser - Landing Page
+
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Difficulty } from '@/types';
+import { Header } from '@/components/layout/Header';
+import styles from './page.module.css';
+
+const difficulties: { value: Difficulty; label: string; description: string }[] = [
+  { value: 'easy', label: 'Easy', description: 'Full article excerpts + images + category hints' },
+  { value: 'medium', label: 'Medium', description: 'Partial text + images, no categories' },
+  { value: 'hard', label: 'Hard', description: 'Image only OR single sentence' },
+  { value: 'expert', label: 'Expert', description: 'Heavily redacted text, key words removed' },
+];
+
+export default function HomePage() {
+  const router = useRouter();
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('easy');
+
+  const handlePlay = () => {
+    router.push(`/play/single?difficulty=${selectedDifficulty}`);
+  };
+
+  return (
+    <div className={styles.container}>
+      <Header />
+
+      <div className={styles.hero}>
+        <h1 className={styles.title}>
+          <span className={styles.titleWiki}>Wiki</span>
+          <span className={styles.titleGuesser}>Guesser</span>
+        </h1>
+        <p className={styles.subtitle}>
+          Can you guess the Wikipedia article from its content?
+        </p>
+      </div>
+
+      <main className={styles.main}>
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>Choose Difficulty</h2>
+
+          <div className={styles.difficultyGrid}>
+            {difficulties.map((diff) => (
+              <button
+                key={diff.value}
+                onClick={() => setSelectedDifficulty(diff.value)}
+                className={`${styles.difficultyButton} ${selectedDifficulty === diff.value ? styles.selected : ''}`}
+              >
+                <span className={styles.difficultyLabel}>{diff.label}</span>
+                <span className={styles.difficultyDesc}>{diff.description}</span>
+              </button>
+            ))}
+          </div>
+
+          <button onClick={handlePlay} className={styles.playButton}>
+            Play Now
+          </button>
+        </div>
+
+        <div className={styles.howToPlay}>
+          <h3 className={styles.howToPlayTitle}>How to Play</h3>
+          <ol className={styles.howToPlayList}>
+            <li>You'll see content from a Wikipedia article (images, text, or both)</li>
+            <li>Type your guess for what the article is about</li>
+            <li>Earn points for correct answers - faster = more points!</li>
+            <li>Build streaks for bonus multipliers 🔥</li>
+          </ol>
+        </div>
+      </main>
+
+      <footer className={styles.footer}>
+        <p>Powered by Wikipedia • Built with ❤️</p>
+      </footer>
+    </div>
+  );
+}

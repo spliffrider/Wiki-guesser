@@ -1,0 +1,67 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-4);
+    background-color: var(--color-bg-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.scoreSection,
+.roundSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.score {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.round {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+.streakSection {
+    margin-left: auto;
+}
+
+.streakBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-4);
+    background: linear-gradient(135deg, var(--color-streak), #ff8c42);
+    color: var(--color-text-inverse);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--text-sm);
+    border-radius: var(--border-radius-full);
+    box-shadow: var(--shadow-glow-streak);
+    animation: pulse-glow 2s ease infinite;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: var(--shadow-glow-streak);
+    }
+
+    50% {
+        box-shadow: 0 0 25px var(--color-streak-glow);
+    }
+}

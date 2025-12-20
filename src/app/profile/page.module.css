@@ -1,0 +1,194 @@
+.container {
+    min-height: 100vh;
+    background-color: var(--color-bg-secondary);
+}
+
+.main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4);
+}
+
+.loadingContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border-light);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.profileHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    color: var(--color-text-inverse);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-3xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.profileInfo {
+    flex: 1;
+}
+
+.username {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-1);
+}
+
+.email {
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.statCard {
+    background-color: var(--color-bg-primary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-5);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.statValue {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    margin-bottom: var(--space-1);
+}
+
+.statLabel {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.historySection {
+    background-color: var(--color-bg-primary);
+    border-radius: var(--border-radius-xl);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.sectionTitle {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-4);
+}
+
+.loading {
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: var(--space-8);
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--color-text-muted);
+}
+
+.gamesList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.gameCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius-md);
+}
+
+.gameInfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.gameDifficulty {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+}
+
+.gameDate {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.gameStats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+}
+
+.gameScore {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.gameCorrect {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.actions {
+    text-align: center;
+}
+
+.playButton {
+    display: inline-block;
+    padding: var(--space-4) var(--space-8);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-inverse);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    border-radius: var(--border-radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.playButton:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+}

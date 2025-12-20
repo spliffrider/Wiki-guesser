@@ -1,0 +1,74 @@
+.timerContainer {
+    width: 100%;
+}
+
+.timerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+.timerLabel {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timerValue {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+    transition: color var(--transition-fast);
+}
+
+.timerValue.normal {
+    color: var(--color-success);
+}
+
+.timerValue.warning {
+    color: var(--color-warning);
+}
+
+.timerValue.danger {
+    color: var(--color-error);
+    animation: pulse 0.5s ease infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.timerBar {
+    height: 8px;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+}
+
+.timerBarFill {
+    height: 100%;
+    border-radius: var(--border-radius-full);
+    transition: width 100ms linear, background-color var(--transition-base);
+}
+
+.timerBarFill.normal {
+    background-color: var(--color-success);
+}
+
+.timerBarFill.warning {
+    background-color: var(--color-warning);
+}
+
+.timerBarFill.danger {
+    background-color: var(--color-error);
+}
