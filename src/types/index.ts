@@ -69,7 +69,7 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, {
     easy: {
         timeLimit: 45,
         multiplier: 1.0,
-        showImage: true,
+        showImage: true,  // Images shown (filtered for safe articles)
         showExcerpt: true,
         showCategories: true,
         excerptLength: 300,
@@ -77,7 +77,7 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, {
     medium: {
         timeLimit: 30,
         multiplier: 1.5,
-        showImage: true,
+        showImage: true,  // Images shown (filtered for safe articles)
         showExcerpt: true,
         showCategories: false,
         excerptLength: 150,
@@ -85,10 +85,10 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, {
     hard: {
         timeLimit: 20,
         multiplier: 2.0,
-        showImage: true,
-        showExcerpt: false,
+        showImage: false,  // No images for hard
+        showExcerpt: true,
         showCategories: false,
-        excerptLength: 0,
+        excerptLength: 100,
     },
     expert: {
         timeLimit: 15,

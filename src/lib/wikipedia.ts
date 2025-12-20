@@ -61,11 +61,19 @@ export async function getArticleDetails(title: string): Promise<WikiTopic | null
         // Get categories
         const categories = await getArticleCategories(title);
 
+        // Check if article is likely to have answer-revealing image (films, TV shows, albums, etc.)
+        const hasUnsafeImage = isMediaArticle(categories, data.title, data.description || '');
+
+        // Only include image if it's unlikely to reveal the answer
+        const safeImageUrl = hasUnsafeImage
+            ? null
+            : (data.thumbnail?.source || data.originalimage?.source || null);
+
         return {
             id: data.pageid?.toString() || title,
             title: data.title,
             excerpt: data.extract || '',
-            imageUrl: data.thumbnail?.source || data.originalimage?.source || null,
+            imageUrl: safeImageUrl,
             categories: categories.slice(0, 5), // Limit to 5 categories
             pageUrl: data.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodedTitle}`,
         };
@@ -73,6 +81,46 @@ export async function getArticleDetails(title: string): Promise<WikiTopic | null
         console.error(`Error fetching article details for "${title}":`, error);
         return null;
     }
+}
+
+/**
+ * Detects if an article is about media content that likely has title-revealing images
+ * (films, TV shows, albums, books, video games, etc.)
+ */
+function isMediaArticle(categories: string[], title: string, description: string): boolean {
+    const lowerCategories = categories.map(c => c.toLowerCase()).join(' ');
+    const lowerDesc = description.toLowerCase();
+
+    // Keywords that suggest the image might have the title on it
+    const unsafeKeywords = [
+        'film', 'films', 'movie', 'movies',
+        'television', 'tv series', 'tv show', 'tv program',
+        'album', 'albums', 'discography', 'single',
+        'song', 'songs', 'soundtrack',
+        'video game', 'video games', 'game',
+        'book', 'books', 'novel', 'novels',
+        'comic', 'comics', 'manga', 'anime',
+        'documentary', 'documentaries',
+        'magazine', 'newspaper',
+        'musical', 'play', 'theatre',
+        'podcast', 'radio program',
+        'logo', 'brand', 'company',
+    ];
+
+    // Check both categories and description
+    for (const keyword of unsafeKeywords) {
+        if (lowerCategories.includes(keyword) || lowerDesc.includes(keyword)) {
+            return true;
+        }
+    }
+
+    // Check if title contains year pattern like "(2023 film)" or "(album)"
+    const titlePattern = /\(\d{4}\s+(film|album|song|series|game)\)|(\(film\)|\(album\)|\(song\)|\(tv series\))/i;
+    if (titlePattern.test(title)) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
