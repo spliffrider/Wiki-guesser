@@ -49,6 +49,13 @@ export function Header() {
                                     >
                                         Profile
                                     </Link>
+                                    <Link
+                                        href="/leaderboard"
+                                        className={styles.dropdownItem}
+                                        onClick={() => setShowDropdown(false)}
+                                    >
+                                        🏆 Leaderboard
+                                    </Link>
                                     <div className={styles.dropdownStats}>
                                         <span>🏆 {profile?.total_score?.toLocaleString() || 0}</span>
                                         <span>🎮 {profile?.games_played || 0} games</span>
