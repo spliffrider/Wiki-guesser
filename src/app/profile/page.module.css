@@ -192,3 +192,56 @@
     box-shadow: var(--shadow-md);
     text-decoration: none;
 }
+
+/* Achievements */
+.achievementsSection {
+    margin-bottom: var(--space-8);
+}
+
+.achievementsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3);
+}
+
+.achievementCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.achievementCard.unlocked {
+    background: linear-gradient(135deg, var(--color-success-bg, #e6f7e6) 0%, var(--color-bg-primary) 100%);
+    border: 2px solid var(--color-success, #28a745);
+}
+
+.achievementCard.locked {
+    background: var(--color-bg-secondary);
+    border: 2px solid var(--color-border-light);
+    opacity: 0.6;
+}
+
+.achievementIcon {
+    font-size: 2rem;
+}
+
+.achievementCard.locked .achievementIcon {
+    filter: grayscale(100%);
+}
+
+.achievementName {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.achievementHint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.3;
+}

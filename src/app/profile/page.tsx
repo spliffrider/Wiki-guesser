@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGameHistory } from '@/lib/database';
+import { getUserAchievements, ACHIEVEMENTS, UnlockedAchievement } from '@/lib/achievements';
 import { Game } from '@/types/database';
 import { Header } from '@/components/layout/Header';
 import styles from './page.module.css';
@@ -16,6 +17,7 @@ export default function ProfilePage() {
     const { user, profile, isLoading } = useAuth();
     const [games, setGames] = useState<Game[]>([]);
     const [loadingGames, setLoadingGames] = useState(true);
+    const [achievements, setAchievements] = useState<UnlockedAchievement[]>([]);
 
     useEffect(() => {
         if (!isLoading && !user) {
@@ -28,6 +30,9 @@ export default function ProfilePage() {
             getGameHistory(user.id, 10).then(data => {
                 setGames(data);
                 setLoadingGames(false);
+            });
+            getUserAchievements(user.id).then(data => {
+                setAchievements(data);
             });
         }
     }, [user]);
@@ -47,6 +52,8 @@ export default function ProfilePage() {
     const accuracy = profile.games_played > 0
         ? Math.round((profile.correct_answers / (profile.games_played * 5)) * 100)
         : 0;
+
+    const unlockedIds = new Set(achievements.map(a => a.achievement_id));
 
     return (
         <div className={styles.container}>
@@ -85,6 +92,30 @@ export default function ProfilePage() {
                         <span className={styles.statLabel}>Best Streak</span>
                     </div>
                 </div>
+
+                <section className={styles.achievementsSection}>
+                    <h2 className={styles.sectionTitle}>
+                        Achievements ({achievements.length}/{ACHIEVEMENTS.length})
+                    </h2>
+                    <div className={styles.achievementsGrid}>
+                        {ACHIEVEMENTS.map((achievement) => {
+                            const isUnlocked = unlockedIds.has(achievement.id);
+                            return (
+                                <div
+                                    key={achievement.id}
+                                    className={`${styles.achievementCard} ${isUnlocked ? styles.unlocked : styles.locked}`}
+                                    title={achievement.description}
+                                >
+                                    <span className={styles.achievementIcon}>{achievement.icon}</span>
+                                    <span className={styles.achievementName}>{achievement.name}</span>
+                                    {!isUnlocked && (
+                                        <span className={styles.achievementHint}>{achievement.description}</span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
 
                 <section className={styles.historySection}>
                     <h2 className={styles.sectionTitle}>Recent Games</h2>
@@ -129,3 +160,4 @@ export default function ProfilePage() {
         </div>
     );
 }
+
