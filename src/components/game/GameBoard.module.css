@@ -19,6 +19,28 @@
     max-width: 300px;
 }
 
+.headerControls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.soundToggle {
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-2);
+    font-size: var(--text-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    line-height: 1;
+}
+
+.soundToggle:hover {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-primary);
+}
+
 .topicCard {
     position: relative;
     background-color: var(--color-bg-primary);

@@ -2,8 +2,10 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { WikiTopic, Difficulty, DIFFICULTY_CONFIG } from '@/types';
 import { redactExcerpt } from '@/lib/wikipedia';
+import { useSound } from '@/hooks/useSound';
 import { Timer } from './Timer';
 import { MultipleChoice } from './MultipleChoice';
 import { ScoreDisplay } from './ScoreDisplay';
@@ -56,6 +58,18 @@ export function GameBoard({
     longestStreak,
 }: GameBoardProps) {
     const config = DIFFICULTY_CONFIG[difficulty];
+    const { toggleMute, isMuted } = useSound();
+    const [soundEnabled, setSoundEnabled] = useState(true);
+
+    // Sync with stored preference
+    useEffect(() => {
+        setSoundEnabled(!isMuted());
+    }, [isMuted]);
+
+    const handleToggleSound = () => {
+        toggleMute();
+        setSoundEnabled(!soundEnabled);
+    };
 
     if (phase === 'finished') {
         const correctCount = longestStreak; // approximation for share text
@@ -183,11 +197,21 @@ export function GameBoard({
                     currentRound={currentRound}
                     totalRounds={totalRounds}
                 />
-                <div className={styles.timerWrapper}>
-                    <Timer
-                        timeRemaining={timeRemaining}
-                        timeLimit={config.timeLimit}
-                    />
+                <div className={styles.headerControls}>
+                    <button
+                        onClick={handleToggleSound}
+                        className={styles.soundToggle}
+                        aria-label={soundEnabled ? 'Mute sounds' : 'Enable sounds'}
+                        title={soundEnabled ? 'Mute sounds' : 'Enable sounds'}
+                    >
+                        {soundEnabled ? '🔊' : '🔇'}
+                    </button>
+                    <div className={styles.timerWrapper}>
+                        <Timer
+                            timeRemaining={timeRemaining}
+                            timeLimit={config.timeLimit}
+                        />
+                    </div>
                 </div>
             </div>
 
