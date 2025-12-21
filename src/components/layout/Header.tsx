@@ -5,11 +5,13 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/hooks/useTheme';
 import styles from './Header.module.css';
 
 export function Header() {
     const { user, profile, signOut, isLoading } = useAuth();
     const [showDropdown, setShowDropdown] = useState(false);
+    const { toggleTheme, isDark } = useTheme();
 
     const handleSignOut = async () => {
         await signOut();
@@ -24,6 +26,14 @@ export function Header() {
                 </Link>
 
                 <nav className={styles.nav}>
+                    <button
+                        onClick={toggleTheme}
+                        className={styles.themeToggle}
+                        aria-label="Toggle theme"
+                    >
+                        {isDark ? '☀️' : '🌙'}
+                    </button>
+
                     {isLoading ? (
                         <div className={styles.loading}>...</div>
                     ) : user ? (
@@ -84,3 +94,4 @@ export function Header() {
         </header>
     );
 }
+

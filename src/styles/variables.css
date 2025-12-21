@@ -162,9 +162,69 @@
     --z-tooltip: 500;
 }
 
-/* Dark mode support (optional, for future) */
+/* ============================================
+   DARK MODE
+   ============================================ */
+
+/* Dark mode via class (for manual toggle) */
+html.dark {
+    /* Background tiers - inverted */
+    --color-bg-primary: #1a1a2e;
+    --color-bg-secondary: #16162a;
+    --color-bg-tertiary: #252550;
+    --color-bg-highlight: #2d2d44;
+
+    /* Text colors - inverted */
+    --color-text-primary: #e8e8e8;
+    --color-text-secondary: #b8b8c8;
+    --color-text-muted: #8888a0;
+    --color-text-inverse: #1a1a2e;
+
+    /* Primary adjusts for dark */
+    --color-primary: #6366f1;
+    --color-primary-hover: #818cf8;
+    --color-primary-light: rgba(99, 102, 241, 0.15);
+
+    /* Gamification colors - slightly brighter */
+    --color-success-bg: rgba(20, 134, 109, 0.2);
+    --color-error-bg: rgba(215, 51, 51, 0.2);
+    --color-warning-bg: rgba(172, 102, 0, 0.2);
+
+    /* Borders - darker */
+    --color-border: #4a4a6a;
+    --color-border-light: #3a3a5a;
+    --color-border-subtle: #2a2a4a;
+
+    /* Shadows - adjusted for dark */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 8px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Auto dark mode via system preference */
 @media (prefers-color-scheme: dark) {
-    :root {
-        /* Could add dark mode overrides here */
+    html:not(.light) {
+        --color-bg-primary: #1a1a2e;
+        --color-bg-secondary: #16162a;
+        --color-bg-tertiary: #252550;
+        --color-bg-highlight: #2d2d44;
+        --color-text-primary: #e8e8e8;
+        --color-text-secondary: #b8b8c8;
+        --color-text-muted: #8888a0;
+        --color-text-inverse: #1a1a2e;
+        --color-primary: #6366f1;
+        --color-primary-hover: #818cf8;
+        --color-primary-light: rgba(99, 102, 241, 0.15);
+        --color-success-bg: rgba(20, 134, 109, 0.2);
+        --color-error-bg: rgba(215, 51, 51, 0.2);
+        --color-warning-bg: rgba(172, 102, 0, 0.2);
+        --color-border: #4a4a6a;
+        --color-border-light: #3a3a5a;
+        --color-border-subtle: #2a2a4a;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 8px 10px rgba(0, 0, 0, 0.4);
     }
 }
