@@ -106,16 +106,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const signIn = async (email: string, password: string) => {
         console.log('[Auth] Attempting sign in...');
+        console.log('[Auth] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            // Add timeout to detect hanging
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Auth timeout after 10 seconds')), 10000);
+            });
+
+            const authPromise = supabase.auth.signInWithPassword({
                 email,
                 password,
             });
-            console.log('[Auth] Sign in result:', error ? error.message : 'success');
-            return { error };
-        } catch (err) {
-            console.error('[Auth] Sign in exception:', err);
-            return { error: { message: 'Network error - please try again' } as any };
+
+            console.log('[Auth] Calling Supabase auth...');
+            const result = await Promise.race([authPromise, timeoutPromise]) as any;
+
+            console.log('[Auth] Sign in result:', result.error ? result.error.message : 'success');
+            return { error: result.error };
+        } catch (err: any) {
+            console.error('[Auth] Sign in exception:', err.message);
+            return { error: { message: err.message || 'Network error - please try again' } as any };
         }
     };
 
