@@ -54,9 +54,14 @@ export default function HomePage() {
             ))}
           </div>
 
-          <button onClick={handlePlay} className={styles.playButton}>
-            Play Now
-          </button>
+          <div className={styles.playButtons}>
+            <button onClick={handlePlay} className={styles.playButton}>
+              Play Solo
+            </button>
+            <button onClick={() => router.push('/play/multi')} className={styles.multiplayerButton}>
+              👥 Multiplayer
+            </button>
+          </div>
         </div>
 
         <div className={styles.howToPlay}>

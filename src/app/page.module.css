@@ -124,6 +124,30 @@
   transform: translateY(0);
 }
 
+.playButtons {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.multiplayerButton {
+  flex: 1;
+  padding: var(--space-5) var(--space-8);
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.multiplayerButton:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+}
+
 .howToPlay {
   max-width: 500px;
   text-align: center;
