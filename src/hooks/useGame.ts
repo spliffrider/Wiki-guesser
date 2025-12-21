@@ -185,11 +185,13 @@ export function useGame(): UseGameReturn {
                 });
             }
 
-            // Get curated questions for other categories
-            const oddWikiOutQuestions = getRandomOddWikiOut(oddWikiOutCount);
-            const whenInWikiQuestions = getRandomWhenInWiki(whenInWikiCount);
-            const wikiOrFictionQuestions = getRandomWikiOrFiction(wikiOrFictionCount);
-            const wikiLinksQuestions = getRandomWikiLinks(wikiLinksCount);
+            // Get curated questions for other categories (async - tries Supabase first, falls back to JSON)
+            const [oddWikiOutQuestions, whenInWikiQuestions, wikiOrFictionQuestions, wikiLinksQuestions] = await Promise.all([
+                getRandomOddWikiOut(oddWikiOutCount),
+                getRandomWhenInWiki(whenInWikiCount),
+                getRandomWikiOrFiction(wikiOrFictionCount),
+                getRandomWikiLinks(wikiLinksCount),
+            ]);
 
             // Track indices for each category
             let wikiWhatIndex = 0;
