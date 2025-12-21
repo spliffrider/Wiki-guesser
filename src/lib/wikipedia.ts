@@ -301,3 +301,64 @@ function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+import { ContentTier, TIER_CATEGORIES } from './levels';
+
+/**
+ * Get topics appropriate for a player's level tier
+ * Lower tiers get easier, well-known topics from curated categories
+ * Higher tiers get random articles
+ */
+export async function getTopicsForTier(tier: ContentTier, count: number = 5): Promise<WikiTopic[]> {
+    // Master tier or if no categories defined, use random articles
+    if (tier === 'master' || TIER_CATEGORIES[tier].length === 0) {
+        return getRandomTopics(count);
+    }
+
+    const categories = TIER_CATEGORIES[tier];
+    const topics: WikiTopic[] = [];
+    const fetchedTitles = new Set<string>();
+
+    // Try to get topics from tier categories
+    for (let attempts = 0; attempts < 3 && topics.length < count; attempts++) {
+        // Pick a random category from the tier
+        const category = categories[Math.floor(Math.random() * categories.length)];
+
+        try {
+            // Fetch random pages from this category
+            const response = await fetch(
+                `${WIKI_ACTION_API}?action=query&list=categorymembers&cmtitle=Category:${encodeURIComponent(category)}&cmlimit=20&cmtype=page&format=json&origin=*`
+            );
+
+            if (!response.ok) continue;
+
+            const data = await response.json();
+            const pages = data.query?.categorymembers || [];
+
+            // Shuffle and pick random pages
+            const shuffled = pages.sort(() => Math.random() - 0.5);
+
+            for (const page of shuffled) {
+                if (topics.length >= count) break;
+                if (fetchedTitles.has(page.title)) continue;
+
+                fetchedTitles.add(page.title);
+
+                const details = await getArticleDetails(page.title);
+                if (details && details.excerpt.length > 50) {
+                    topics.push(details);
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching from category ${category}:`, error);
+        }
+    }
+
+    // If we didn't get enough, fill with random articles
+    if (topics.length < count) {
+        const randomTopics = await getRandomTopics(count - topics.length);
+        topics.push(...randomTopics);
+    }
+
+    return topics;
+}
+

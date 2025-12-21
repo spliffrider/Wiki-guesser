@@ -11,8 +11,9 @@ import {
     WikiTopic,
     DIFFICULTY_CONFIG
 } from '@/types';
-import { getRandomTopics, checkAnswer } from '@/lib/wikipedia';
+import { getRandomTopics, getTopicsForTier, checkAnswer } from '@/lib/wikipedia';
 import { calculateScore } from '@/lib/scoring';
+import { calculateLevel, getContentTier } from '@/lib/levels';
 
 const DEFAULT_TOTAL_ROUNDS = 5;
 
@@ -30,7 +31,7 @@ interface UseGameReturn {
     state: GameState;
     isLoading: boolean;
     error: string | null;
-    startGame: (difficulty: Difficulty) => Promise<void>;
+    startGame: (difficulty: Difficulty, userLevel?: number) => Promise<void>;
     submitGuess: (guess: string) => void;
     nextRound: () => void;
     resetGame: () => void;
@@ -121,22 +122,25 @@ export function useGame(): UseGameReturn {
         setLastScoreBreakdown(null);
     }, []);
 
-    const startGame = useCallback(async (difficulty: Difficulty) => {
+    const startGame = useCallback(async (difficulty: Difficulty, userLevel?: number) => {
         setIsLoading(true);
         setError(null);
 
         try {
+            // Determine content tier based on user level (default to beginner if not logged in)
+            const level = userLevel || 1;
+            const tier = getContentTier(level);
+
             // Fetch extra topics for wrong answer options (4 options per round = 3 wrong per round)
             const totalTopicsNeeded = DEFAULT_TOTAL_ROUNDS * 4; // 4 options per round
-            const topics = await getRandomTopics(totalTopicsNeeded + 5); // extra buffer
 
-            if (topics.length < totalTopicsNeeded) {
+            // Use tier-based topics for correct answers, random for wrong options
+            const correctTopics = await getTopicsForTier(tier, DEFAULT_TOTAL_ROUNDS);
+            const wrongOptionsPool = await getRandomTopics(DEFAULT_TOTAL_ROUNDS * 3 + 5);
+
+            if (correctTopics.length < DEFAULT_TOTAL_ROUNDS || wrongOptionsPool.length < DEFAULT_TOTAL_ROUNDS * 3) {
                 throw new Error('Could not fetch enough topics. Please try again.');
             }
-
-            // Split topics: first N for correct answers, rest for wrong options pool
-            const correctTopics = topics.slice(0, DEFAULT_TOTAL_ROUNDS);
-            const wrongOptionsPool = topics.slice(DEFAULT_TOTAL_ROUNDS);
 
             // Create rounds with shuffled options
             const rounds: Round[] = correctTopics.map((topic, index) => {

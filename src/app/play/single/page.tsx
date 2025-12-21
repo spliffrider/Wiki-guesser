@@ -6,8 +6,10 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, Suspense, useRef } from 'react';
 import { useGame } from '@/hooks/useGame';
 import { useSaveGame } from '@/hooks/useSaveGame';
+import { useAuth } from '@/contexts/AuthContext';
 import { GameBoard } from '@/components/game/GameBoard';
 import { Difficulty } from '@/types';
+import { calculateLevel } from '@/lib/levels';
 import styles from './page.module.css';
 
 function SinglePlayerGame() {
@@ -15,6 +17,8 @@ function SinglePlayerGame() {
     const difficultyParam = searchParams.get('difficulty') as Difficulty | null;
     const difficulty = difficultyParam || 'easy';
     const hasSavedRef = useRef(false);
+
+    const { profile } = useAuth();
 
     const {
         state,
@@ -31,13 +35,16 @@ function SinglePlayerGame() {
 
     const { saveGameIfLoggedIn } = useSaveGame();
 
+    // Calculate user level from total score (XP)
+    const userLevel = profile ? calculateLevel(profile.total_score) : 1;
+
     // Start game on mount
     useEffect(() => {
         if (state.phase === 'selecting') {
-            startGame(difficulty);
+            startGame(difficulty, userLevel);
             hasSavedRef.current = false;
         }
-    }, [difficulty, state.phase, startGame]);
+    }, [difficulty, state.phase, startGame, userLevel]);
 
     // Save game when finished
     useEffect(() => {
