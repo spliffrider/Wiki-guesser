@@ -58,6 +58,28 @@ export function GameBoard({
     const config = DIFFICULTY_CONFIG[difficulty];
 
     if (phase === 'finished') {
+        const correctCount = longestStreak; // approximation for share text
+        const shareText = `🎮 I scored ${score.toLocaleString()} points in Wiki Guesser!\n🔥 ${longestStreak} streak | ${difficulty} difficulty\n\nCan you beat my score? Play at:`;
+        const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'https://wikiguesser.com';
+
+        const handleShare = async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Wiki Guesser Score',
+                        text: shareText,
+                        url: shareUrl,
+                    });
+                } catch (err) {
+                    // User cancelled or error
+                }
+            } else {
+                // Fallback: copy to clipboard
+                await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                alert('Score copied to clipboard!');
+            }
+        };
+
         return (
             <div className={styles.finishedContainer}>
                 <div className={styles.finishedCard}>
@@ -83,9 +105,14 @@ export function GameBoard({
                         </div>
                     </div>
 
-                    <button onClick={onPlayAgain} className={styles.playAgainButton}>
-                        Play Again
-                    </button>
+                    <div className={styles.actionButtons}>
+                        <button onClick={onPlayAgain} className={styles.playAgainButton}>
+                            Play Again
+                        </button>
+                        <button onClick={handleShare} className={styles.shareButton}>
+                            📤 Share Score
+                        </button>
+                    </div>
 
                     <div className={styles.dedicationBox}>
                         <p className={styles.dedicationText}>

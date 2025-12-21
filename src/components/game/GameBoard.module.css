@@ -250,6 +250,31 @@
     box-shadow: var(--shadow-lg);
 }
 
+.actionButtons {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.shareButton {
+    padding: var(--space-4) var(--space-8);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary);
+    background: transparent;
+    border: 2px solid var(--color-primary);
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.shareButton:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-2px);
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .header {
