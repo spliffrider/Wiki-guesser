@@ -1,0 +1,64 @@
+{
+    "questions": [
+        {
+            "statement": "Honey never spoils and edible honey has been found in Egyptian tombs",
+            "isTrue": true,
+            "explanation": "Archaeologists have found 3000-year-old honey in Egyptian tombs that was still perfectly edible due to honey's low moisture content and acidic pH.",
+            "source": "Honey"
+        },
+        {
+            "statement": "The Great Wall of China is visible from space with the naked eye",
+            "isTrue": false,
+            "explanation": "Despite popular belief, the Great Wall is not visible from space without aid. It's too narrow (about 5-8 meters wide) to be seen from orbital distances.",
+            "source": "Great Wall of China"
+        },
+        {
+            "statement": "Octopuses have three hearts",
+            "isTrue": true,
+            "explanation": "Octopuses have two branchial hearts that pump blood through the gills and one systemic heart that pumps blood through the body.",
+            "source": "Octopus"
+        },
+        {
+            "statement": "Lightning never strikes the same place twice",
+            "isTrue": false,
+            "explanation": "Lightning frequently strikes the same place multiple times. Tall structures like the Empire State Building are struck about 20-25 times per year.",
+            "source": "Lightning"
+        },
+        {
+            "statement": "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid",
+            "isTrue": true,
+            "explanation": "The Great Pyramid was completed around 2560 BCE, Cleopatra lived around 30 BCE, and the Moon landing was 1969 CE. About 2500 years separate Cleopatra from the pyramids, but only ~2000 years from the Moon landing.",
+            "source": "Cleopatra"
+        },
+        {
+            "statement": "Goldfish have a memory span of only 3 seconds",
+            "isTrue": false,
+            "explanation": "Goldfish actually have memories that last for months. They can be trained to respond to certain light cues and remember them for extended periods.",
+            "source": "Goldfish"
+        },
+        {
+            "statement": "Bananas are berries, but strawberries are not",
+            "isTrue": true,
+            "explanation": "Botanically, a berry develops from a single ovary and has seeds embedded in the flesh. Bananas qualify, but strawberries are 'accessory fruits' with seeds on the outside.",
+            "source": "Berry (botany)"
+        },
+        {
+            "statement": "Humans only use 10% of their brain",
+            "isTrue": false,
+            "explanation": "Brain imaging shows that we use virtually every part of the brain, just not all at once. Different activities engage different regions.",
+            "source": "Ten percent of the brain myth"
+        },
+        {
+            "statement": "Venus is the only planet in our solar system that rotates clockwise",
+            "isTrue": false,
+            "explanation": "Both Venus and Uranus rotate clockwise (retrograde rotation). Venus rotates very slowly, taking 243 Earth days for one rotation.",
+            "source": "Venus"
+        },
+        {
+            "statement": "A day on Venus is longer than a year on Venus",
+            "isTrue": true,
+            "explanation": "Venus takes 243 Earth days to rotate once on its axis, but only 225 Earth days to orbit the Sun, making its day longer than its year.",
+            "source": "Venus"
+        }
+    ]
+}

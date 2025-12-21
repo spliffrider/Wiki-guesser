@@ -9,11 +9,24 @@ import {
     Difficulty,
     Round,
     WikiTopic,
-    DIFFICULTY_CONFIG
+    DIFFICULTY_CONFIG,
+    QuestionCategory,
+    CategoryData,
+    OddWikiOutData,
+    WhenInWikiData,
+    WikiOrFictionData,
+    WikiLinksData,
 } from '@/types';
 import { getRandomTopics, getTopicsForTier, checkAnswer } from '@/lib/wikipedia';
 import { calculateScore } from '@/lib/scoring';
 import { calculateLevel, getContentTier } from '@/lib/levels';
+import {
+    getRandomCategory,
+    getRandomOddWikiOut,
+    getRandomWhenInWiki,
+    getRandomWikiOrFiction,
+    getRandomWikiLinks,
+} from '@/lib/questions';
 
 const DEFAULT_TOTAL_ROUNDS = 5;
 
@@ -25,6 +38,18 @@ function shuffleArray<T>(array: T[]): T[] {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
+}
+
+// Create a placeholder WikiTopic for non-wiki_what categories
+function createPlaceholderTopic(title: string): WikiTopic {
+    return {
+        id: `placeholder-${Date.now()}`,
+        title,
+        excerpt: '',
+        imageUrl: null,
+        categories: [],
+        pageUrl: '',
+    };
 }
 
 interface UseGameReturn {
@@ -131,41 +156,130 @@ export function useGame(): UseGameReturn {
             const level = userLevel || 1;
             const tier = getContentTier(level);
 
-            // Fetch extra topics for wrong answer options (4 options per round = 3 wrong per round)
-            const totalTopicsNeeded = DEFAULT_TOTAL_ROUNDS * 4; // 4 options per round
-
-            // Use tier-based topics for correct answers, random for wrong options
-            const correctTopics = await getTopicsForTier(tier, DEFAULT_TOTAL_ROUNDS);
-            const wrongOptionsPool = await getRandomTopics(DEFAULT_TOTAL_ROUNDS * 3 + 5);
-
-            if (correctTopics.length < DEFAULT_TOTAL_ROUNDS || wrongOptionsPool.length < DEFAULT_TOTAL_ROUNDS * 3) {
-                throw new Error('Could not fetch enough topics. Please try again.');
+            // Generate a random category for each round
+            const roundCategories: QuestionCategory[] = [];
+            for (let i = 0; i < DEFAULT_TOTAL_ROUNDS; i++) {
+                roundCategories.push(getRandomCategory());
             }
 
-            // Create rounds with shuffled options
-            const rounds: Round[] = correctTopics.map((topic, index) => {
-                // Get 3 wrong options from the pool (unique per round)
-                const wrongStartIndex = index * 3;
-                const wrongOptions = wrongOptionsPool
-                    .slice(wrongStartIndex, wrongStartIndex + 3)
-                    .map(t => t.title);
+            // Count how many of each category we need
+            const wikiWhatCount = roundCategories.filter(c => c === 'wiki_what').length;
+            const oddWikiOutCount = roundCategories.filter(c => c === 'odd_wiki_out').length;
+            const whenInWikiCount = roundCategories.filter(c => c === 'when_in_wiki').length;
+            const wikiOrFictionCount = roundCategories.filter(c => c === 'wiki_or_fiction').length;
+            const wikiLinksCount = roundCategories.filter(c => c === 'wiki_links').length;
 
-                // Combine correct + wrong and shuffle
-                const allOptions = [topic.title, ...wrongOptions];
-                const shuffledOptions = shuffleArray(allOptions);
+            // Fetch topics for wiki_what rounds (need correct + 3 wrong per round)
+            const correctTopics = wikiWhatCount > 0
+                ? await getTopicsForTier(tier, wikiWhatCount)
+                : [];
+            const wrongOptionsPool = wikiWhatCount > 0
+                ? await getRandomTopics(wikiWhatCount * 3 + 5)
+                : [];
 
-                return {
+            // Get curated questions for other categories
+            const oddWikiOutQuestions = getRandomOddWikiOut(oddWikiOutCount);
+            const whenInWikiQuestions = getRandomWhenInWiki(whenInWikiCount);
+            const wikiOrFictionQuestions = getRandomWikiOrFiction(wikiOrFictionCount);
+            const wikiLinksQuestions = getRandomWikiLinks(wikiLinksCount);
+
+            // Track indices for each category
+            let wikiWhatIndex = 0;
+            let oddWikiOutIndex = 0;
+            let whenInWikiIndex = 0;
+            let wikiOrFictionIndex = 0;
+            let wikiLinksIndex = 0;
+
+            // Create rounds with category-specific data
+            const rounds: Round[] = roundCategories.map((category, index) => {
+                const baseRound = {
                     roundNumber: index + 1,
-                    topic,
-                    options: shuffledOptions,
                     timeLimit: DIFFICULTY_CONFIG[difficulty].timeLimit,
-                    startedAt: null,
-                    endedAt: null,
-                    guess: null,
-                    isCorrect: null,
-                    timeTakenMs: null,
+                    startedAt: null as number | null,
+                    endedAt: null as number | null,
+                    guess: null as string | null,
+                    isCorrect: null as boolean | null,
+                    timeTakenMs: null as number | null,
                     pointsEarned: 0,
                 };
+
+                switch (category) {
+                    case 'wiki_what': {
+                        const topic = correctTopics[wikiWhatIndex];
+                        const wrongStartIdx = wikiWhatIndex * 3;
+                        const wrongOptions = wrongOptionsPool
+                            .slice(wrongStartIdx, wrongStartIdx + 3)
+                            .map(t => t.title);
+                        const allOptions = [topic.title, ...wrongOptions];
+                        wikiWhatIndex++;
+
+                        return {
+                            ...baseRound,
+                            category: 'wiki_what' as QuestionCategory,
+                            topic,
+                            options: shuffleArray(allOptions),
+                            correctAnswer: topic.title,
+                        };
+                    }
+
+                    case 'odd_wiki_out': {
+                        const data = oddWikiOutQuestions[oddWikiOutIndex];
+                        oddWikiOutIndex++;
+                        // The options are the items themselves
+                        return {
+                            ...baseRound,
+                            category: 'odd_wiki_out' as QuestionCategory,
+                            topic: createPlaceholderTopic('Odd Wiki Out'),
+                            options: data.items,
+                            correctAnswer: data.items[data.impostorIndex],
+                            categoryData: data as CategoryData,
+                        };
+                    }
+
+                    case 'when_in_wiki': {
+                        const data = whenInWikiQuestions[whenInWikiIndex];
+                        whenInWikiIndex++;
+                        return {
+                            ...baseRound,
+                            category: 'when_in_wiki' as QuestionCategory,
+                            topic: createPlaceholderTopic('When in Wiki?'),
+                            options: data.yearOptions.map(y => y.toString()),
+                            correctAnswer: data.correctYear.toString(),
+                            categoryData: data as CategoryData,
+                        };
+                    }
+
+                    case 'wiki_or_fiction': {
+                        const data = wikiOrFictionQuestions[wikiOrFictionIndex];
+                        wikiOrFictionIndex++;
+                        return {
+                            ...baseRound,
+                            category: 'wiki_or_fiction' as QuestionCategory,
+                            topic: createPlaceholderTopic('Wiki or Fiction?'),
+                            options: ['TRUE', 'FALSE'],
+                            correctAnswer: data.isTrue ? 'TRUE' : 'FALSE',
+                            categoryData: data as CategoryData,
+                        };
+                    }
+
+                    case 'wiki_links': {
+                        const data = wikiLinksQuestions[wikiLinksIndex];
+                        wikiLinksIndex++;
+                        // Use the connection options as multiple choice
+                        const options = data.connectionOptions || [data.connection];
+                        return {
+                            ...baseRound,
+                            category: 'wiki_links' as QuestionCategory,
+                            topic: createPlaceholderTopic('Wiki Links'),
+                            options: shuffleArray(options),
+                            correctAnswer: data.connection,
+                            categoryData: data as CategoryData,
+                        };
+                    }
+
+                    default:
+                        throw new Error(`Unknown category: ${category}`);
+                }
             });
 
             // Start first round
@@ -192,7 +306,8 @@ export function useGame(): UseGameReturn {
     }, []);
 
     const submitGuess = useCallback((guess: string) => {
-        if (state.phase !== 'playing' || !currentTopic) {
+        const currentRound = state.rounds[state.currentRound];
+        if (state.phase !== 'playing' || !currentRound) {
             return;
         }
 
@@ -207,7 +322,11 @@ export function useGame(): UseGameReturn {
             ? endTime - roundStartTimeRef.current
             : 0;
 
-        const isCorrect = checkAnswer(guess, currentTopic.title);
+        // Use correctAnswer from round for all categories
+        // For wiki_what, use fuzzy matching; for others, use exact match
+        const isCorrect = currentRound.category === 'wiki_what'
+            ? checkAnswer(guess, currentRound.correctAnswer)
+            : guess === currentRound.correctAnswer;
 
         let pointsEarned = 0;
         let newStreak = state.streak;

@@ -1,0 +1,154 @@
+{
+    "questions": [
+        {
+            "titles": [
+                "Sherlock Holmes",
+                "James Bond",
+                "Harry Potter",
+                "Katniss Everdeen"
+            ],
+            "connection": "British fictional characters",
+            "connectionOptions": [
+                "British fictional characters",
+                "Movie villains",
+                "Real historical figures",
+                "Comic book heroes"
+            ]
+        },
+        {
+            "titles": [
+                "Amazon",
+                "Nile",
+                "Yangtze",
+                "Mississippi"
+            ],
+            "connection": "Longest rivers in the world",
+            "connectionOptions": [
+                "Longest rivers in the world",
+                "African rivers",
+                "Rivers in Asia",
+                "Smallest rivers"
+            ]
+        },
+        {
+            "titles": [
+                "Albert Einstein",
+                "Isaac Newton",
+                "Marie Curie",
+                "Stephen Hawking"
+            ],
+            "connection": "Physicists who changed our understanding of the universe",
+            "connectionOptions": [
+                "Physicists who changed our understanding of the universe",
+                "Nobel Prize winners in Literature",
+                "19th century inventors",
+                "Ancient Greek philosophers"
+            ]
+        },
+        {
+            "titles": [
+                "Guitar",
+                "Violin",
+                "Cello",
+                "Harp"
+            ],
+            "connection": "Stringed musical instruments",
+            "connectionOptions": [
+                "Stringed musical instruments",
+                "Percussion instruments",
+                "Wind instruments",
+                "Electronic instruments"
+            ]
+        },
+        {
+            "titles": [
+                "Rome",
+                "Athens",
+                "Cairo",
+                "Beijing"
+            ],
+            "connection": "Ancient capital cities that still exist today",
+            "connectionOptions": [
+                "Ancient capital cities that still exist today",
+                "Cities founded in the 20th century",
+                "Island cities",
+                "Cities in the Americas"
+            ]
+        },
+        {
+            "titles": [
+                "Everest",
+                "K2",
+                "Kangchenjunga",
+                "Lhotse"
+            ],
+            "connection": "Mountains over 8,000 meters tall",
+            "connectionOptions": [
+                "Mountains over 8,000 meters tall",
+                "Active volcanoes",
+                "Mountains in Europe",
+                "Mountains under 5,000 meters"
+            ]
+        },
+        {
+            "titles": [
+                "Bitcoin",
+                "Ethereum",
+                "Dogecoin",
+                "Litecoin"
+            ],
+            "connection": "Cryptocurrencies",
+            "connectionOptions": [
+                "Cryptocurrencies",
+                "Programming languages",
+                "Social media platforms",
+                "Video game consoles"
+            ]
+        },
+        {
+            "titles": [
+                "Tesla",
+                "Edison",
+                "Faraday",
+                "Volta"
+            ],
+            "connection": "Scientists with electrical units named after them",
+            "connectionOptions": [
+                "Scientists with electrical units named after them",
+                "Inventors of the telephone",
+                "Astronomers",
+                "Chemists who discovered elements"
+            ]
+        },
+        {
+            "titles": [
+                "Mona Lisa",
+                "The Starry Night",
+                "The Scream",
+                "Girl with a Pearl Earring"
+            ],
+            "connection": "World-famous paintings",
+            "connectionOptions": [
+                "World-famous paintings",
+                "Sculptures",
+                "Photographs",
+                "Buildings"
+            ]
+        },
+        {
+            "titles": [
+                "Linux",
+                "Windows",
+                "macOS",
+                "Android"
+            ],
+            "connection": "Operating systems",
+            "connectionOptions": [
+                "Operating systems",
+                "Web browsers",
+                "Social networks",
+                "Video games"
+            ]
+        }
+    ]
+}

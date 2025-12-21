@@ -1,0 +1,104 @@
+{
+    "questions": [
+        {
+            "items": [
+                "Apple",
+                "Microsoft",
+                "Google",
+                "Mount Everest"
+            ],
+            "impostorIndex": 3,
+            "connection": "Technology companies"
+        },
+        {
+            "items": [
+                "Jupiter",
+                "Saturn",
+                "Mars",
+                "The Moon"
+            ],
+            "impostorIndex": 3,
+            "connection": "Planets in our solar system"
+        },
+        {
+            "items": [
+                "Leonardo da Vinci",
+                "Michelangelo",
+                "Raphael",
+                "Wolfgang Amadeus Mozart"
+            ],
+            "impostorIndex": 3,
+            "connection": "Renaissance artists"
+        },
+        {
+            "items": [
+                "Python",
+                "Java",
+                "JavaScript",
+                "Photoshop"
+            ],
+            "impostorIndex": 3,
+            "connection": "Programming languages"
+        },
+        {
+            "items": [
+                "Amazon River",
+                "Nile River",
+                "Mississippi River",
+                "Mount Kilimanjaro"
+            ],
+            "impostorIndex": 3,
+            "connection": "Major rivers"
+        },
+        {
+            "items": [
+                "Beatles",
+                "Rolling Stones",
+                "Led Zeppelin",
+                "Vincent van Gogh"
+            ],
+            "impostorIndex": 3,
+            "connection": "British rock bands"
+        },
+        {
+            "items": [
+                "Hydrogen",
+                "Oxygen",
+                "Carbon",
+                "Granite"
+            ],
+            "impostorIndex": 3,
+            "connection": "Chemical elements"
+        },
+        {
+            "items": [
+                "Tokyo",
+                "Paris",
+                "London",
+                "Grand Canyon"
+            ],
+            "impostorIndex": 3,
+            "connection": "Capital cities"
+        },
+        {
+            "items": [
+                "Shakespeare",
+                "Dickens",
+                "Austen",
+                "Beethoven"
+            ],
+            "impostorIndex": 3,
+            "connection": "English authors"
+        },
+        {
+            "items": [
+                "Chess",
+                "Checkers",
+                "Go",
+                "Tennis"
+            ],
+            "impostorIndex": 3,
+            "connection": "Board games"
+        }
+    ]
+}

@@ -82,3 +82,68 @@
         font-size: var(--text-sm);
     }
 }
+
+/* True/False variant */
+.optionsTwoColumn {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.optionTrue:hover:not(:disabled) {
+    border-color: var(--color-success);
+    background-color: rgba(34, 197, 94, 0.1);
+}
+
+.optionFalse:hover:not(:disabled) {
+    border-color: var(--color-error);
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.optionTrue.selected {
+    border-color: var(--color-success);
+    background-color: rgba(34, 197, 94, 0.15);
+}
+
+.optionFalse.selected {
+    border-color: var(--color-error);
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+.letterTrue {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.letterFalse {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Year variant */
+.optionsYear {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.optionYear {
+    justify-content: center;
+    text-align: center;
+}
+
+.optionYear .optionText {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+@media (max-width: 640px) {
+
+    .optionsTwoColumn,
+    .optionsYear {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+    }
+
+    .optionYear .optionText {
+        font-size: var(--text-lg);
+    }
+}

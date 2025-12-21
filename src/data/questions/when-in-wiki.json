@@ -1,0 +1,104 @@
+{
+    "questions": [
+        {
+            "event": "The first human walked on the Moon during the Apollo 11 mission",
+            "correctYear": 1969,
+            "yearOptions": [
+                1965,
+                1969,
+                1972,
+                1975
+            ]
+        },
+        {
+            "event": "The Berlin Wall fell, marking the end of the Cold War era",
+            "correctYear": 1989,
+            "yearOptions": [
+                1985,
+                1989,
+                1991,
+                1995
+            ]
+        },
+        {
+            "event": "World Wide Web was invented by Tim Berners-Lee",
+            "correctYear": 1989,
+            "yearOptions": [
+                1985,
+                1989,
+                1993,
+                1997
+            ]
+        },
+        {
+            "event": "The Titanic sank on its maiden voyage",
+            "correctYear": 1912,
+            "yearOptions": [
+                1905,
+                1912,
+                1918,
+                1923
+            ]
+        },
+        {
+            "event": "The first iPhone was released by Apple",
+            "correctYear": 2007,
+            "yearOptions": [
+                2004,
+                2007,
+                2010,
+                2012
+            ]
+        },
+        {
+            "event": "World War I officially ended with the Treaty of Versailles",
+            "correctYear": 1919,
+            "yearOptions": [
+                1916,
+                1918,
+                1919,
+                1921
+            ]
+        },
+        {
+            "event": "The Soviet Union launched Sputnik 1, the first artificial satellite",
+            "correctYear": 1957,
+            "yearOptions": [
+                1952,
+                1957,
+                1961,
+                1965
+            ]
+        },
+        {
+            "event": "Nelson Mandela was released from prison after 27 years",
+            "correctYear": 1990,
+            "yearOptions": [
+                1986,
+                1990,
+                1994,
+                1998
+            ]
+        },
+        {
+            "event": "The French Revolution began with the storming of the Bastille",
+            "correctYear": 1789,
+            "yearOptions": [
+                1776,
+                1789,
+                1799,
+                1804
+            ]
+        },
+        {
+            "event": "Albert Einstein published his theory of special relativity",
+            "correctYear": 1905,
+            "yearOptions": [
+                1895,
+                1905,
+                1915,
+                1925
+            ]
+        }
+    ]
+}

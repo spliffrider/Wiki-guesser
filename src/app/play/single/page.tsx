@@ -116,6 +116,9 @@ function SinglePlayerGame() {
                     onNextRound={nextRound}
                     onPlayAgain={resetGame}
                     longestStreak={state.longestStreak}
+                    category={state.rounds[state.currentRound]?.category}
+                    categoryData={state.rounds[state.currentRound]?.categoryData}
+                    correctAnswer={state.rounds[state.currentRound]?.correctAnswer}
                 />
             </main>
         </div>
