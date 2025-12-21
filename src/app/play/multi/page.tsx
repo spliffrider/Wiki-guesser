@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,10 +14,25 @@ export default function MultiplayerLobbyPage() {
     const router = useRouter();
     const { user, profile, isLoading: authLoading } = useAuth();
 
+    // Debug log
+    console.log('[Multiplayer] Auth state:', { authLoading, user: !!user, profile: !!profile });
+
     const [joinCode, setJoinCode] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [isJoining, setIsJoining] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [timedOut, setTimedOut] = useState(false);
+
+    // Timeout fallback for auth loading
+    useEffect(() => {
+        if (authLoading) {
+            const timeout = setTimeout(() => {
+                console.log('[Multiplayer] Auth loading timed out');
+                setTimedOut(true);
+            }, 3000); // 3 second timeout
+            return () => clearTimeout(timeout);
+        }
+    }, [authLoading]);
 
     const handleCreate = async () => {
         if (!user || !profile) return;
@@ -64,7 +79,8 @@ export default function MultiplayerLobbyPage() {
         }
     };
 
-    if (authLoading) {
+    // Show loading only briefly, then show auth prompt if no user
+    if (authLoading && !timedOut) {
         return (
             <div className={styles.container}>
                 <Header />
