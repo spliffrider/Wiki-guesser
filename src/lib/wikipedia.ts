@@ -362,3 +362,75 @@ export async function getTopicsForTier(tier: ContentTier, count: number = 5): Pr
     return topics;
 }
 
+/**
+ * Get topics related to a given topic by fetching from the same categories
+ * This helps prevent "giveaway" scenarios where wrong options are obviously different
+ */
+export async function getRelatedTopics(
+    baseTopic: WikiTopic,
+    count: number = 3,
+    excludeTitles: string[] = []
+): Promise<WikiTopic[]> {
+    const topics: WikiTopic[] = [];
+    const excludeSet = new Set([baseTopic.title, ...excludeTitles].map(t => t.toLowerCase()));
+
+    // Filter out meta-categories that won't help with matching
+    const usableCategories = baseTopic.categories.filter(cat => {
+        const lower = cat.toLowerCase();
+        return !lower.includes('articles') &&
+            !lower.includes('pages') &&
+            !lower.includes('wikipedia') &&
+            !lower.includes('wikidata') &&
+            !lower.includes('cs1') &&
+            !lower.includes('webarchive') &&
+            !lower.includes('short description');
+    });
+
+    if (usableCategories.length === 0) {
+        // Fallback to random topics if no usable categories
+        return getRandomTopics(count);
+    }
+
+    // Try each category until we have enough topics
+    for (const category of usableCategories) {
+        if (topics.length >= count) break;
+
+        try {
+            const response = await fetch(
+                `${WIKI_ACTION_API}?action=query&list=categorymembers&cmtitle=Category:${encodeURIComponent(category)}&cmlimit=20&cmtype=page&format=json&origin=*`
+            );
+
+            if (!response.ok) continue;
+
+            const data = await response.json();
+            const pages = data.query?.categorymembers || [];
+
+            // Shuffle to get variety
+            const shuffled = pages.sort(() => Math.random() - 0.5);
+
+            for (const page of shuffled) {
+                if (topics.length >= count) break;
+                if (excludeSet.has(page.title.toLowerCase())) continue;
+
+                const details = await getArticleDetails(page.title);
+                if (details && details.excerpt.length > 50) {
+                    excludeSet.add(details.title.toLowerCase());
+                    topics.push(details);
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching related topics from category ${category}:`, error);
+        }
+    }
+
+    // If we still don't have enough, fill with random topics
+    if (topics.length < count) {
+        const randomTopics = await getRandomTopics(count - topics.length);
+        // Filter out any that match excludeSet
+        const filtered = randomTopics.filter(t => !excludeSet.has(t.title.toLowerCase()));
+        topics.push(...filtered.slice(0, count - topics.length));
+    }
+
+    return topics.slice(0, count);
+}
+

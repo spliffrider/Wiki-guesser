@@ -17,7 +17,7 @@ import {
     WikiOrFictionData,
     WikiLinksData,
 } from '@/types';
-import { getRandomTopics, getTopicsForTier, checkAnswer } from '@/lib/wikipedia';
+import { getRandomTopics, getTopicsForTier, checkAnswer, getRelatedTopics } from '@/lib/wikipedia';
 import { calculateScore } from '@/lib/scoring';
 import { calculateLevel, getContentTier } from '@/lib/levels';
 import {
@@ -169,13 +169,21 @@ export function useGame(): UseGameReturn {
             const wikiOrFictionCount = roundCategories.filter(c => c === 'wiki_or_fiction').length;
             const wikiLinksCount = roundCategories.filter(c => c === 'wiki_links').length;
 
-            // Fetch topics for wiki_what rounds (need correct + 3 wrong per round)
+            // Fetch topics for wiki_what rounds (need correct + 3 related wrong per round)
             const correctTopics = wikiWhatCount > 0
                 ? await getTopicsForTier(tier, wikiWhatCount)
                 : [];
-            const wrongOptionsPool = wikiWhatCount > 0
-                ? await getRandomTopics(wikiWhatCount * 3 + 5)
-                : [];
+
+            // For each correct topic, fetch related topics as wrong options (anti-giveaway)
+            // This ensures wrong options are from the same category as the correct answer
+            const wikiWhatRoundData: Array<{ topic: WikiTopic; wrongOptions: string[] }> = [];
+            for (const topic of correctTopics) {
+                const relatedTopics = await getRelatedTopics(topic, 3);
+                wikiWhatRoundData.push({
+                    topic,
+                    wrongOptions: relatedTopics.map(t => t.title),
+                });
+            }
 
             // Get curated questions for other categories
             const oddWikiOutQuestions = getRandomOddWikiOut(oddWikiOutCount);
@@ -205,20 +213,16 @@ export function useGame(): UseGameReturn {
 
                 switch (category) {
                     case 'wiki_what': {
-                        const topic = correctTopics[wikiWhatIndex];
-                        const wrongStartIdx = wikiWhatIndex * 3;
-                        const wrongOptions = wrongOptionsPool
-                            .slice(wrongStartIdx, wrongStartIdx + 3)
-                            .map(t => t.title);
-                        const allOptions = [topic.title, ...wrongOptions];
+                        const roundData = wikiWhatRoundData[wikiWhatIndex];
+                        const allOptions = [roundData.topic.title, ...roundData.wrongOptions];
                         wikiWhatIndex++;
 
                         return {
                             ...baseRound,
                             category: 'wiki_what' as QuestionCategory,
-                            topic,
+                            topic: roundData.topic,
                             options: shuffleArray(allOptions),
-                            correctAnswer: topic.title,
+                            correctAnswer: roundData.topic.title,
                         };
                     }
 
