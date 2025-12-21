@@ -2,8 +2,10 @@
 
 'use client';
 
+import { useEffect } from 'react';
 import { WikiTopic } from '@/types';
 import { formatScore } from '@/lib/scoring';
+import { useSound } from '@/hooks/useSound';
 import styles from './RoundResult.module.css';
 
 interface RoundResultProps {
@@ -31,6 +33,17 @@ export function RoundResult({
     onContinue,
     isLastRound,
 }: RoundResultProps) {
+    const { playCorrect, playWrong } = useSound();
+
+    // Play sound when component mounts
+    useEffect(() => {
+        if (isCorrect) {
+            playCorrect();
+        } else {
+            playWrong();
+        }
+    }, [isCorrect, playCorrect, playWrong]);
+
     return (
         <div className={`${styles.container} ${isCorrect ? styles.correct : styles.incorrect}`}>
             <div className={styles.resultHeader}>
