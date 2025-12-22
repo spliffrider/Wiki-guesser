@@ -69,6 +69,11 @@ function shuffleArray<T>(array: T[]): T[] {
  * @returns Array of OddWikiOutData
  */
 export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiOutData[]> {
+    // Skip Supabase calls during SSR
+    if (typeof window === 'undefined') {
+        return [];
+    }
+
     try {
         const supabase = getSupabaseClient();
 
@@ -108,6 +113,8 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
  * @returns Array of WhenInWikiData
  */
 export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWikiData[]> {
+    if (typeof window === 'undefined') return [];
+
     try {
         const supabase = getSupabaseClient();
 
@@ -145,6 +152,8 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
  * @returns Array of WikiOrFictionData
  */
 export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiOrFictionData[]> {
+    if (typeof window === 'undefined') return [];
+
     try {
         const supabase = getSupabaseClient();
 
@@ -183,6 +192,8 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
  * @returns Array of WikiLinksData
  */
 export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinksData[]> {
+    if (typeof window === 'undefined') return [];
+
     try {
         const supabase = getSupabaseClient();
 
