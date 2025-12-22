@@ -39,23 +39,24 @@ except ImportError:
     exit(1)
 
 try:
-    from pageviewapi import period as pageview_period
+    import pageviewapi
+    PAGEVIEW_AVAILABLE = True
 except ImportError:
-    print("ERROR: pageviewapi not installed. Run: pip install pageviewapi")
-    exit(1)
+    PAGEVIEW_AVAILABLE = False
+    print("NOTE: pageviewapi not installed. Using fallback article list.")
 
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 # API Configuration
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 MODEL_NAME = "gemini-2.0-flash"
 
 # Processing Limits
-MAX_ARTICLES = 20  # Number of Wikipedia articles to process
+MAX_ARTICLES = 5  # Number of Wikipedia articles to process (reduced for rate limits)
 MAX_SUMMARY_WORDS = 500  # Maximum words to extract from each article
 API_DELAY_SECONDS = 1.5  # Delay between Gemini API calls (rate limiting)
 
@@ -141,21 +142,22 @@ def get_top_articles(count: int = 100) -> list[str]:
     Fetch the most-viewed Wikipedia articles from the last 30 days.
     Returns a list of article titles (already filtered for meta pages).
     """
-    print(f"\n📡 Fetching top {count} Wikipedia articles from pageviews...")
+    print(f"\n📡 Fetching top {count} Wikipedia articles...")
+    
+    if not PAGEVIEW_AVAILABLE:
+        return get_fallback_articles(count)
     
     # Calculate date range (last 30 days)
     end_date = datetime.now() - timedelta(days=1)
-    start_date = end_date - timedelta(days=30)
     
     try:
         # Get pageview data for the last month
-        result = pageview_period.top(
+        result = pageviewapi.top(
             project="en.wikipedia",
             access="all-access",
-            year=end_date.year,
+            year=str(end_date.year),
             month=f"{end_date.month:02d}",
-            day=f"{end_date.day:02d}",
-            limit=count * 2  # Fetch more to account for filtering
+            day=f"{end_date.day:02d}"
         )
         
         articles = []
@@ -172,7 +174,7 @@ def get_top_articles(count: int = 100) -> list[str]:
                                 break
                         
         print(f"✅ Found {len(articles)} valid articles")
-        return articles[:count]
+        return articles[:count] if articles else get_fallback_articles(count)
         
     except Exception as e:
         print(f"❌ Error fetching pageviews: {e}")
