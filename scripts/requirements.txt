@@ -1,0 +1,8 @@
+# Wiki Guesser - Bulk Content Generator Dependencies
+# Install with: pip install -r requirements.txt
+
+google-generativeai>=0.3.0
+wikipedia-api>=0.6.0
+mwparserfromhell>=0.6.5
+pageviewapi>=3.2.0
+python-dotenv>=1.0.0
