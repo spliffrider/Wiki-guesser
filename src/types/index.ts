@@ -17,24 +17,28 @@ export interface OddWikiOutData {
     items: string[];        // 4 items: 3 belong together, 1 is the impostor
     impostorIndex: number;  // Index of the item that doesn't belong
     connection: string;     // What connects the 3 correct items
+    topic: string;          // Category/Topic of the question
 }
 
 export interface WhenInWikiData {
     event: string;          // Description of the historical event
     correctYear: number;    // The actual year
     yearOptions: number[];  // 4 year choices (shuffled, includes correct)
+    topic: string;          // Category/Topic of the question
 }
 
 export interface WikiOrFictionData {
     statement: string;      // The claim to evaluate
     isTrue: boolean;        // Whether the statement is true
     explanation: string;    // Explanation shown after answering
+    topic: string;          // Category/Topic of the question
     source?: string;        // Optional Wikipedia article source
 }
 
 export interface WikiLinksData {
     titles: string[];           // 4 Wikipedia article titles
     connection: string;         // What connects them
+    topic: string;              // Category/Topic of the question
     connectionOptions?: string[]; // Multiple choice options for connection
 }
 

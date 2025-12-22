@@ -15,6 +15,7 @@ interface OddWikiOutRow {
     items: string[];
     impostor_index: number;
     connection: string;
+    topic: string | null;
     wikipedia_url: string;
     image_url: string | null;
     created_at: string;
@@ -25,6 +26,7 @@ interface WhenInWikiRow {
     event: string;
     correct_year: number;
     year_options: number[];
+    topic: string | null;
     wikipedia_url: string;
     image_url: string | null;
     created_at: string;
@@ -35,6 +37,7 @@ interface WikiOrFictionRow {
     statement: string;
     is_true: boolean;
     explanation: string;
+    topic: string | null;
     wikipedia_url: string;
     image_url: string | null;
     created_at: string;
@@ -45,6 +48,7 @@ interface WikiLinksRow {
     titles: string[];
     connection: string;
     connection_options: string[];
+    topic: string | null;
     wikipedia_url: string;
     image_url: string | null;
     created_at: string;
@@ -99,6 +103,7 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
             items: row.items,
             impostorIndex: row.impostor_index,
             connection: row.connection,
+            topic: row.topic || '',
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomOddWikiOutFromDB:', err);
@@ -138,6 +143,7 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
             event: row.event,
             correctYear: row.correct_year,
             yearOptions: row.year_options,
+            topic: row.topic || '',
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWhenInWikiFromDB:', err);
@@ -177,6 +183,7 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
             statement: row.statement,
             isTrue: row.is_true,
             explanation: row.explanation,
+            topic: row.topic || '',
             source: row.wikipedia_url,
         }));
     } catch (err) {
@@ -217,6 +224,7 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
             titles: row.titles,
             connection: row.connection,
             connectionOptions: row.connection_options,
+            topic: row.topic || '',
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiLinksFromDB:', err);
