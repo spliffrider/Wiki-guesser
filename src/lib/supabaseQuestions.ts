@@ -116,6 +116,7 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
             impostorIndex: row.impostor_index,
             connection: row.connection,
             topic: row.topic || '',
+            source: row.wikipedia_url,
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomOddWikiOutFromDB:', err);
@@ -156,6 +157,7 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
             correctYear: row.correct_year,
             yearOptions: row.year_options,
             topic: row.topic || '',
+            source: row.wikipedia_url,
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWhenInWikiFromDB:', err);
@@ -237,6 +239,7 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
             connection: row.connection,
             connectionOptions: row.connection_options,
             topic: row.topic || '',
+            source: row.wikipedia_url,
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiLinksFromDB:', err);

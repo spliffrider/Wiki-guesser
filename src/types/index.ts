@@ -18,6 +18,7 @@ export interface OddWikiOutData {
     impostorIndex: number;  // Index of the item that doesn't belong
     connection: string;     // What connects the 3 correct items
     topic: string;          // Category/Topic of the question
+    source?: string;        // Wikipedia URL
 }
 
 export interface WhenInWikiData {
@@ -25,6 +26,7 @@ export interface WhenInWikiData {
     correctYear: number;    // The actual year
     yearOptions: number[];  // 4 year choices (shuffled, includes correct)
     topic: string;          // Category/Topic of the question
+    source?: string;        // Wikipedia URL
 }
 
 export interface WikiOrFictionData {
@@ -40,6 +42,7 @@ export interface WikiLinksData {
     connection: string;         // What connects them
     topic: string;              // Category/Topic of the question
     connectionOptions?: string[]; // Multiple choice options for connection
+    source?: string;            // Wikipedia URL
 }
 
 export type CategoryData =

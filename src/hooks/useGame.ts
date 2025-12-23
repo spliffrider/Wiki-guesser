@@ -42,14 +42,14 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 // Create a placeholder WikiTopic for non-wiki_what categories
-function createPlaceholderTopic(title: string): WikiTopic {
+function createPlaceholderTopic(title: string, pageUrl?: string): WikiTopic {
     return {
         id: `placeholder-${Date.now()}`,
         title,
         excerpt: '',
         imageUrl: null,
         categories: [],
-        pageUrl: '',
+        pageUrl: pageUrl || '',
     };
 }
 
@@ -217,7 +217,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'odd_wiki_out' as QuestionCategory,
-                            topic: createPlaceholderTopic('Odd Wiki Out'),
+                            topic: createPlaceholderTopic('Odd Wiki Out', data.source),
                             options: data.items,
                             correctAnswer: data.items[data.impostorIndex],
                             categoryData: data as CategoryData,
@@ -230,7 +230,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'when_in_wiki' as QuestionCategory,
-                            topic: createPlaceholderTopic('When in Wiki?'),
+                            topic: createPlaceholderTopic('When in Wiki?', data.source),
                             options: data.yearOptions.map(y => y.toString()),
                             correctAnswer: data.correctYear.toString(),
                             categoryData: data as CategoryData,
@@ -243,7 +243,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'wiki_or_fiction' as QuestionCategory,
-                            topic: createPlaceholderTopic('Wiki or Fiction?'),
+                            topic: createPlaceholderTopic('Wiki or Fiction?', data.source),
                             options: ['TRUE', 'FALSE'],
                             correctAnswer: data.isTrue ? 'TRUE' : 'FALSE',
                             categoryData: data as CategoryData,
@@ -258,7 +258,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'wiki_links' as QuestionCategory,
-                            topic: createPlaceholderTopic('Wiki Links'),
+                            topic: createPlaceholderTopic('Wiki Links', data.source),
                             options: shuffleArray(options),
                             correctAnswer: data.connection,
                             categoryData: data as CategoryData,
