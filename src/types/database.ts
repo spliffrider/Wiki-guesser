@@ -8,6 +8,8 @@ export interface Profile {
     games_played: number;
     correct_answers: number;
     longest_streak: number;
+    is_admin: boolean;
+    reward_points: number;
     created_at: string;
     updated_at: string;
 }
@@ -28,11 +30,13 @@ export interface Database {
         Tables: {
             profiles: {
                 Row: Profile;
-                Insert: Omit<Profile, 'created_at' | 'updated_at' | 'total_score' | 'games_played' | 'correct_answers' | 'longest_streak'> & {
+                Insert: Omit<Profile, 'created_at' | 'updated_at' | 'total_score' | 'games_played' | 'correct_answers' | 'longest_streak' | 'is_admin' | 'reward_points'> & {
                     total_score?: number;
                     games_played?: number;
                     correct_answers?: number;
                     longest_streak?: number;
+                    is_admin?: boolean;
+                    reward_points?: number;
                 };
                 Update: Partial<Omit<Profile, 'id' | 'created_at'>>;
             };

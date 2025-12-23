@@ -1,0 +1,72 @@
+// Wiki Guesser - Wiki What Fields
+import styles from '../QuestionForm.module.css';
+
+export function WikiWhatFields({ data, updateData }: any) {
+    return (
+        <>
+            <div className={styles.formGroup}>
+                <label className={styles.label}>Article Title (The Answer)</label>
+                <input
+                    className={styles.input}
+                    value={data.title}
+                    onChange={(e) => updateData({ title: e.target.value })}
+                    placeholder="e.g., Albert Einstein"
+                    required
+                />
+            </div>
+
+            <div className={styles.formGroup}>
+                <label className={styles.label}>Excerpt (The Clue)</label>
+                <textarea
+                    className={styles.textarea}
+                    value={data.excerpt}
+                    onChange={(e) => updateData({ excerpt: e.target.value })}
+                    placeholder="Provide a mysterious clue about the topic without revealing the name..."
+                    required
+                />
+                <span className={styles.helperText}>Avoid using the title in the clue.</span>
+            </div>
+
+            <div className={styles.formGroup}>
+                <label className={styles.label}>Topic</label>
+                <input
+                    className={styles.input}
+                    value={data.topic}
+                    onChange={(e) => updateData({ topic: e.target.value })}
+                    placeholder="e.g., Physics, History, Science"
+                    required
+                />
+            </div>
+
+            <div className={styles.formGroup}>
+                <label className={styles.label}>Wrong Options</label>
+                <div className={styles.optionsGrid}>
+                    {data.wrongOptions.map((opt: string, i: number) => (
+                        <input
+                            key={i}
+                            className={styles.input}
+                            value={opt}
+                            onChange={(e) => {
+                                const newOpts = [...data.wrongOptions];
+                                newOpts[i] = e.target.value;
+                                updateData({ wrongOptions: newOpts });
+                            }}
+                            placeholder={`Wrong Option ${i + 1}`}
+                            required
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.formGroup}>
+                <label className={styles.label}>Image URL (Optional)</label>
+                <input
+                    className={styles.input}
+                    value={data.imageUrl}
+                    onChange={(e) => updateData({ imageUrl: e.target.value })}
+                    placeholder="https://..."
+                />
+            </div>
+        </>
+    );
+}

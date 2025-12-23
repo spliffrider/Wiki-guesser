@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
+import { RewardStar } from './RewardStar';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -26,6 +27,8 @@ export function Header() {
                 </Link>
 
                 <nav className={styles.nav}>
+                    {user && <RewardStar />}
+
                     <button
                         onClick={toggleTheme}
                         className={styles.themeToggle}
