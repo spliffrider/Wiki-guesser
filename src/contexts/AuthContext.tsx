@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Update profile with username
             await supabase
                 .from('profiles')
-                .update({ username })
+                .update({ username } as { username: string })
                 .eq('id', data.user.id);
         }
 
