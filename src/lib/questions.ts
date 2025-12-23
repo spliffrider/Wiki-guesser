@@ -10,12 +10,14 @@ import {
     WikiOrFictionData,
     WikiLinksData,
     QuestionCategory,
+    WikiTopic,
 } from '@/types';
 import {
     getRandomOddWikiOutFromDB,
     getRandomWhenInWikiFromDB,
     getRandomWikiOrFictionFromDB,
     getRandomWikiLinksFromDB,
+    getRandomWikiWhatFromDB,
 } from './supabaseQuestions';
 
 // Fisher-Yates shuffle
@@ -100,6 +102,23 @@ export async function getRandomWikiLinks(count: number = 1): Promise<WikiLinksDa
     return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
+/**
+ * Get random "Wiki What" questions.
+ * Fetches pre-curated Wikipedia articles from Supabase.
+ * Returns empty array if no data (no JSON fallback for this category).
+ */
+export async function getRandomWikiWhat(count: number = 1): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
+    const dbQuestions = await getRandomWikiWhatFromDB(count);
+    if (dbQuestions.length > 0) {
+        return dbQuestions;
+    }
+
+    // No JSON fallback for wiki_what - return empty array
+    // The game logic should skip this category if no questions available
+    console.log('[questions] No wiki_what questions in database');
+    return [];
+}
+
 // ============================================================================
 // SYNCHRONOUS VERSIONS - For backwards compatibility where async isn't needed
 // These only use JSON (useful for initial load or when you know DB is empty)
@@ -133,6 +152,7 @@ export function getRandomWikiLinksSync(count: number = 1): WikiLinksData[] {
  * Get a random category for variety in gameplay
  */
 export function getRandomCategory(): QuestionCategory {
+    // All categories now use fast Supabase queries (no live Wikipedia API calls)
     const categories: QuestionCategory[] = [
         'wiki_what',
         'odd_wiki_out',

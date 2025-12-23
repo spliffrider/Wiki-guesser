@@ -7,6 +7,7 @@ import {
     WhenInWikiData,
     WikiOrFictionData,
     WikiLinksData,
+    WikiTopic,
 } from '@/types';
 
 // Database row types (snake_case from Supabase)
@@ -51,6 +52,17 @@ interface WikiLinksRow {
     topic: string | null;
     wikipedia_url: string;
     image_url: string | null;
+    created_at: string;
+}
+
+interface WikiWhatRow {
+    id: string;
+    title: string;
+    excerpt: string;
+    image_url: string | null;
+    page_url: string;
+    wrong_options: string[];
+    topic: string | null;
     created_at: string;
 }
 
@@ -228,6 +240,52 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
         }));
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiLinksFromDB:', err);
+        return [];
+    }
+}
+
+/**
+ * Fetch random "Wiki What" questions from Supabase.
+ * Returns WikiTopic objects with pre-defined wrong options.
+ * Falls back to empty array on error.
+ * @param count Number of questions to fetch
+ * @returns Array of { topic: WikiTopic, wrongOptions: string[] }
+ */
+export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
+    if (typeof window === 'undefined') return [];
+
+    try {
+        const supabase = getSupabaseClient();
+
+        const { data, error } = await supabase
+            .from('wiki_what_questions')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(count * 3);
+
+        if (error) {
+            console.error('[supabaseQuestions] Error fetching wiki_what:', error.message);
+            return [];
+        }
+
+        if (!data || data.length === 0) {
+            return [];
+        }
+
+        const shuffled = shuffleArray(data as WikiWhatRow[]).slice(0, count);
+        return shuffled.map((row) => ({
+            topic: {
+                id: row.id,
+                title: row.title,
+                excerpt: row.excerpt,
+                imageUrl: row.image_url,
+                categories: [], // Not needed for this category
+                pageUrl: row.page_url,
+            },
+            wrongOptions: row.wrong_options,
+        }));
+    } catch (err) {
+        console.error('[supabaseQuestions] Unexpected error in getRandomWikiWhatFromDB:', err);
         return [];
     }
 }

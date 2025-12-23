@@ -2,7 +2,10 @@
 -- Run this in Supabase SQL Editor
 
 -- All-time leaderboard (top players by total score)
-CREATE OR REPLACE VIEW leaderboard_alltime AS
+-- Using security_invoker to respect RLS policies
+DROP VIEW IF EXISTS leaderboard_alltime;
+CREATE VIEW leaderboard_alltime 
+WITH (security_invoker = true) AS
 SELECT 
     p.id,
     p.username,
@@ -17,7 +20,9 @@ ORDER BY p.total_score DESC
 LIMIT 100;
 
 -- Daily leaderboard (best single game today)
-CREATE OR REPLACE VIEW leaderboard_daily AS
+DROP VIEW IF EXISTS leaderboard_daily;
+CREATE VIEW leaderboard_daily 
+WITH (security_invoker = true) AS
 SELECT 
     p.id,
     p.username,
@@ -33,7 +38,9 @@ ORDER BY g.total_score DESC
 LIMIT 50;
 
 -- Weekly leaderboard (total score this week)  
-CREATE OR REPLACE VIEW leaderboard_weekly AS
+DROP VIEW IF EXISTS leaderboard_weekly;
+CREATE VIEW leaderboard_weekly 
+WITH (security_invoker = true) AS
 SELECT 
     p.id,
     p.username,
@@ -47,3 +54,8 @@ WHERE g.completed_at >= date_trunc('week', CURRENT_DATE)
 GROUP BY p.id, p.username
 ORDER BY week_score DESC
 LIMIT 50;
+
+-- Grant SELECT on the views to authenticated and anon roles
+GRANT SELECT ON leaderboard_alltime TO authenticated, anon;
+GRANT SELECT ON leaderboard_daily TO authenticated, anon;
+GRANT SELECT ON leaderboard_weekly TO authenticated, anon;

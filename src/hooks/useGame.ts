@@ -17,15 +17,16 @@ import {
     WikiOrFictionData,
     WikiLinksData,
 } from '@/types';
-import { getRandomTopics, getTopicsForTier, checkAnswer, getRelatedTopics } from '@/lib/wikipedia';
+import { checkAnswer } from '@/lib/wikipedia';
 import { calculateScore } from '@/lib/scoring';
-import { calculateLevel, getContentTier } from '@/lib/levels';
+import { calculateLevel } from '@/lib/levels';
 import {
     getRandomCategory,
     getRandomOddWikiOut,
     getRandomWhenInWiki,
     getRandomWikiOrFiction,
     getRandomWikiLinks,
+    getRandomWikiWhat,
 } from '@/lib/questions';
 
 const DEFAULT_TOTAL_ROUNDS = 5;
@@ -152,10 +153,6 @@ export function useGame(): UseGameReturn {
         setError(null);
 
         try {
-            // Determine content tier based on user level (default to beginner if not logged in)
-            const level = userLevel || 1;
-            const tier = getContentTier(level);
-
             // Generate a random category for each round
             const roundCategories: QuestionCategory[] = [];
             for (let i = 0; i < DEFAULT_TOTAL_ROUNDS; i++) {
@@ -169,24 +166,9 @@ export function useGame(): UseGameReturn {
             const wikiOrFictionCount = roundCategories.filter(c => c === 'wiki_or_fiction').length;
             const wikiLinksCount = roundCategories.filter(c => c === 'wiki_links').length;
 
-            // Fetch topics for wiki_what rounds (need correct + 3 related wrong per round)
-            const correctTopics = wikiWhatCount > 0
-                ? await getTopicsForTier(tier, wikiWhatCount)
-                : [];
-
-            // For each correct topic, fetch related topics as wrong options (anti-giveaway)
-            // This ensures wrong options are from the same category as the correct answer
-            const wikiWhatRoundData: Array<{ topic: WikiTopic; wrongOptions: string[] }> = [];
-            for (const topic of correctTopics) {
-                const relatedTopics = await getRelatedTopics(topic, 3);
-                wikiWhatRoundData.push({
-                    topic,
-                    wrongOptions: relatedTopics.map(t => t.title),
-                });
-            }
-
-            // Get curated questions for other categories (async - tries Supabase first, falls back to JSON)
-            const [oddWikiOutQuestions, whenInWikiQuestions, wikiOrFictionQuestions, wikiLinksQuestions] = await Promise.all([
+            // Fetch all questions from Supabase in parallel (fast!)
+            const [wikiWhatRoundData, oddWikiOutQuestions, whenInWikiQuestions, wikiOrFictionQuestions, wikiLinksQuestions] = await Promise.all([
+                getRandomWikiWhat(wikiWhatCount),
                 getRandomOddWikiOut(oddWikiOutCount),
                 getRandomWhenInWiki(whenInWikiCount),
                 getRandomWikiOrFiction(wikiOrFictionCount),
