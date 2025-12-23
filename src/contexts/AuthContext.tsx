@@ -95,9 +95,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!error && data.user && username) {
             // Update profile with username
-            await supabase
-                .from('profiles')
-                .update({ username } as { username: string })
+            // Using 'as any' to bypass strict Supabase type inference that causes 'never' type error on Vercel
+            await (supabase
+                .from('profiles') as any)
+                .update({ username })
                 .eq('id', data.user.id);
         }
 
