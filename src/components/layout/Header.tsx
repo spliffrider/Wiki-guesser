@@ -39,7 +39,9 @@ export function Header() {
                     </button>
 
                     {isLoading ? (
-                        <div className={styles.loading}>...</div>
+                        <div className={styles.loading}>
+                            <div className={styles.spinner}></div>
+                        </div>
                     ) : user ? (
                         <div className={styles.userMenu}>
                             <button

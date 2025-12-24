@@ -50,7 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                // Add timeout to prevent infinite loading
+                const timeoutPromise = new Promise<null>((resolve) => {
+                    setTimeout(() => resolve(null), 5000);
+                });
+
+                const sessionPromise = supabase.auth.getSession().then(res => res.data.session);
+                const session = await Promise.race([sessionPromise, timeoutPromise]);
 
                 setSession(session);
                 setUser(session?.user ?? null);
