@@ -4,7 +4,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { getSupabaseClient } from '@/lib/supabase';
+import { getSupabaseClient, supabaseFetch } from '@/lib/supabase';
 import { Profile } from '@/types/database';
 
 interface AuthContextType {
@@ -32,18 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Fetch user profile
     const fetchProfile = async (userId: string) => {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
+        const data = await supabaseFetch<Profile>('profiles', `id=eq.${userId}&select=*`);
 
-        if (error) {
-            console.error('Error fetching profile:', error);
+        if (!data || data.length === 0) {
+            console.error('Error fetching profile: Profile not found');
             return null;
         }
 
-        return data;
+        return data[0];
     };
 
     // Initialize auth state

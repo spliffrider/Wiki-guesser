@@ -24,3 +24,28 @@ export function getSupabaseClient() {
     return browserClient;
 }
 
+/**
+ * Robust fetch helper that bypasses the potentially hanging Supabase JS client
+ * for simple SELECT operations.
+ */
+export async function supabaseFetch<T>(table: string, query: string = 'select=*&order=created_at.desc'): Promise<T[] | null> {
+    const url = `${supabaseUrl}/rest/v1/${table}?${query}`;
+    const headers = {
+        'apikey': supabaseAnonKey,
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await fetch(url, { headers });
+        if (!response.ok) {
+            console.error(`[supabaseFetch] HTTP Error ${response.status} for ${table}`);
+            return null;
+        }
+        return await response.json();
+    } catch (err) {
+        console.error(`[supabaseFetch] Network Error for ${table}:`, err);
+        return null;
+    }
+}
+

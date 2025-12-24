@@ -1,7 +1,7 @@
 // Wiki Guesser - Supabase Question Fetchers
 // Fetches curated questions from Supabase tables
 
-import { getSupabaseClient } from './supabase';
+import { getSupabaseClient, supabaseFetch } from './supabase';
 import {
     OddWikiOutData,
     WhenInWikiData,
@@ -108,7 +108,7 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
     }
 }
 
-const QUERY_TIMEOUT_MS = 15000; // 15 second timeout to handle cold starts or slow networks
+const QUERY_TIMEOUT_MS = 15000; // 15 second timeout
 
 /**
  * Fetch random "Odd Wiki Out" questions from Supabase.
@@ -120,37 +120,16 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<OddWikiOutData[]> => {
-        const supabase = getSupabaseClient();
         const limit = count * 3;
 
-        // TEMPORARY TEST: Direct REST API call bypassing Supabase client
-        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/odd_wiki_out_questions?select=*&order=created_at.desc&limit=${limit}`;
-        const headers = {
-            'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`
-        };
+        // 1. Fetch from main table via direct fetch
+        const mainData = await supabaseFetch('odd_wiki_out_questions', `select=*&order=created_at.desc&limit=${limit}`);
 
-        const response = await fetch(url, { headers });
-        const mainData = response.ok ? await response.json() : null;
-        const mainError = response.ok ? null : { message: `HTTP ${response.status}` };
-
-        console.log('[TEST] Direct fetch result:', { ok: response.ok, status: response.status, dataLength: mainData?.length });
-
-        if (mainError) console.error('[supabaseQuestions] Error fetching main odd_wiki_out:', mainError.message);
-
-        // 2. Fetch from curated UGC
-        const { data: ugcData, error: ugcError } = await supabase
-            .from('user_submitted_questions')
-            .select('*')
-            .eq('status', 'curated')
-            .eq('category', 'odd_wiki_out')
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC odd_wiki_out:', ugcError.message);
+        // 2. Fetch from curated UGC via direct fetch
+        const ugcData = await supabaseFetch('user_submitted_questions', `status=eq.curated&category=eq.odd_wiki_out&select=*&order=created_at.desc&limit=${limit}`);
 
         // 3. Map and Combine
-        const mainMapped = (mainData || []).map((row: OddWikiOutRow) => ({
+        const mainMapped = (mainData as OddWikiOutRow[] || []).map((row: OddWikiOutRow) => ({
             items: row.items,
             impostorIndex: row.impostor_index,
             connection: row.connection,
@@ -197,31 +176,16 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<WhenInWikiData[]> => {
-        const supabase = getSupabaseClient();
         const limit = count * 3;
 
-        // 1. Fetch from main table
-        const { data: mainData, error: mainError } = await supabase
-            .from('when_in_wiki_questions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(limit);
+        // 1. Fetch from main table via direct fetch
+        const mainData = await supabaseFetch('when_in_wiki_questions', `select=*&order=created_at.desc&limit=${limit}`);
 
-        if (mainError) console.error('[supabaseQuestions] Error fetching main when_in_wiki:', mainError.message);
-
-        // 2. Fetch from curated UGC
-        const { data: ugcData, error: ugcError } = await supabase
-            .from('user_submitted_questions')
-            .select('*')
-            .eq('status', 'curated')
-            .eq('category', 'when_in_wiki')
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC when_in_wiki:', ugcError.message);
+        // 2. Fetch from curated UGC via direct fetch
+        const ugcData = await supabaseFetch('user_submitted_questions', `status=eq.curated&category=eq.when_in_wiki&select=*&order=created_at.desc&limit=${limit}`);
 
         // 3. Map and Combine
-        const mainMapped = (mainData || []).map((row: WhenInWikiRow) => ({
+        const mainMapped = (mainData as WhenInWikiRow[] || []).map((row: WhenInWikiRow) => ({
             event: row.event,
             correctYear: row.correct_year,
             yearOptions: row.year_options,
@@ -265,31 +229,16 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<WikiOrFictionData[]> => {
-        const supabase = getSupabaseClient();
         const limit = count * 3;
 
-        // 1. Fetch from main table
-        const { data: mainData, error: mainError } = await supabase
-            .from('wiki_or_fiction_questions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(limit);
+        // 1. Fetch from main table via direct fetch
+        const mainData = await supabaseFetch('wiki_or_fiction_questions', `select=*&order=created_at.desc&limit=${limit}`);
 
-        if (mainError) console.error('[supabaseQuestions] Error fetching main wiki_or_fiction:', mainError.message);
-
-        // 2. Fetch from curated UGC
-        const { data: ugcData, error: ugcError } = await supabase
-            .from('user_submitted_questions')
-            .select('*')
-            .eq('status', 'curated')
-            .eq('category', 'wiki_or_fiction')
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC wiki_or_fiction:', ugcError.message);
+        // 2. Fetch from curated UGC via direct fetch
+        const ugcData = await supabaseFetch('user_submitted_questions', `status=eq.curated&category=eq.wiki_or_fiction&select=*&order=created_at.desc&limit=${limit}`);
 
         // 3. Map and Combine
-        const mainMapped = (mainData || []).map((row: WikiOrFictionRow) => ({
+        const mainMapped = (mainData as WikiOrFictionRow[] || []).map((row: WikiOrFictionRow) => ({
             statement: row.statement,
             isTrue: row.is_true,
             explanation: row.explanation,
@@ -333,31 +282,16 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<WikiLinksData[]> => {
-        const supabase = getSupabaseClient();
         const limit = count * 3;
 
-        // 1. Fetch from main table
-        const { data: mainData, error: mainError } = await supabase
-            .from('wiki_links_questions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(limit);
+        // 1. Fetch from main table via direct fetch
+        const mainData = await supabaseFetch('wiki_links_questions', `select=*&order=created_at.desc&limit=${limit}`);
 
-        if (mainError) console.error('[supabaseQuestions] Error fetching main wiki_links:', mainError.message);
-
-        // 2. Fetch from curated UGC
-        const { data: ugcData, error: ugcError } = await supabase
-            .from('user_submitted_questions')
-            .select('*')
-            .eq('status', 'curated')
-            .eq('category', 'wiki_links')
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC wiki_links:', ugcError.message);
+        // 2. Fetch from curated UGC via direct fetch
+        const ugcData = await supabaseFetch('user_submitted_questions', `status=eq.curated&category=eq.wiki_links&select=*&order=created_at.desc&limit=${limit}`);
 
         // 3. Map and Combine
-        const mainMapped = (mainData || []).map((row: WikiLinksRow) => ({
+        const mainMapped = (mainData as WikiLinksRow[] || []).map((row: WikiLinksRow) => ({
             titles: row.titles,
             connection: row.connection,
             connectionOptions: row.connection_options,
@@ -402,31 +336,16 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> => {
-        const supabase = getSupabaseClient();
         const limit = count * 3;
 
-        // 1. Fetch from main table
-        const { data: mainData, error: mainError } = await supabase
-            .from('wiki_what_questions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(limit);
+        // 1. Fetch from main table via direct fetch
+        const mainData = await supabaseFetch('wiki_what_questions', `select=*&order=created_at.desc&limit=${limit}`);
 
-        if (mainError) console.error('[supabaseQuestions] Error fetching main wiki_what:', mainError.message);
-
-        // 2. Fetch from curated UGC
-        const { data: ugcData, error: ugcError } = await supabase
-            .from('user_submitted_questions')
-            .select('*')
-            .eq('status', 'curated')
-            .eq('category', 'wiki_what')
-            .order('created_at', { ascending: false })
-            .limit(limit);
-
-        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC wiki_what:', ugcError.message);
+        // 2. Fetch from curated UGC via direct fetch
+        const ugcData = await supabaseFetch('user_submitted_questions', `status=eq.curated&category=eq.wiki_what&select=*&order=created_at.desc&limit=${limit}`);
 
         // 3. Map and Combine
-        const mainMapped = (mainData || []).map((row: WikiWhatRow) => ({
+        const mainMapped = (mainData as WikiWhatRow[] || []).map((row: WikiWhatRow) => ({
             topic: {
                 id: row.id,
                 title: row.title,
