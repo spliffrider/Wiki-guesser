@@ -345,6 +345,7 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
         const ugcData = await supabaseFetch('user_submitted_questions', `status=eq.curated&category=eq.wiki_what&select=*&order=created_at.desc&limit=${limit}`);
 
         // 3. Map and Combine
+
         const mainMapped = (mainData as WikiWhatRow[] || []).map((row: WikiWhatRow) => ({
             topic: {
                 id: row.id,
@@ -356,6 +357,7 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
             },
             wrongOptions: row.wrong_options,
         }));
+
 
         const ugcMapped = (ugcData || []).map((_row: unknown) => {
             const row = _row as UserSubmittedQuestion;

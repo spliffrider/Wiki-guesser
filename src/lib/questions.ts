@@ -45,6 +45,8 @@ export async function getRandomOddWikiOut(count: number = 1): Promise<OddWikiOut
         return dbQuestions;
     }
 
+    if (count === 0) return [];
+
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for odd_wiki_out');
     const shuffled = shuffleArray(oddWikiOutData.questions as OddWikiOutData[]);
@@ -61,6 +63,8 @@ export async function getRandomWhenInWiki(count: number = 1): Promise<WhenInWiki
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
+
+    if (count === 0) return [];
 
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for when_in_wiki');
@@ -79,6 +83,8 @@ export async function getRandomWikiOrFiction(count: number = 1): Promise<WikiOrF
         return dbQuestions;
     }
 
+    if (count === 0) return [];
+
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for wiki_or_fiction');
     const shuffled = shuffleArray(wikiOrFictionData.questions as WikiOrFictionData[]);
@@ -96,6 +102,8 @@ export async function getRandomWikiLinks(count: number = 1): Promise<WikiLinksDa
         return dbQuestions;
     }
 
+    if (count === 0) return [];
+
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for wiki_links');
     const shuffled = shuffleArray(wikiLinksData.questions as WikiLinksData[]);
@@ -112,6 +120,8 @@ export async function getRandomWikiWhat(count: number = 1): Promise<Array<{ topi
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
+
+    if (count === 0) return [];
 
     // No JSON fallback for wiki_what - return empty array
     // The game logic should skip this category if no questions available
