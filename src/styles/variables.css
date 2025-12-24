@@ -3,59 +3,58 @@
 
 :root {
     /* ============================================
-     COLOR PALETTE - Wikipedia-inspired core
+     COLOR PALETTE - Encyclopedia / Scholarly Theme
      ============================================ */
 
-    /* Background tiers */
-    --color-bg-primary: #ffffff;
-    --color-bg-secondary: #f8f9fa;
-    --color-bg-tertiary: #eaecf0;
-    --color-bg-highlight: #fffbeb;
+    /* Background tiers - Warm paper textures */
+    --color-bg-primary: #FDF8F3;
+    --color-bg-secondary: #F5EDE3;
+    --color-bg-tertiary: #E8DFD3;
+    --color-bg-highlight: #FFF9E6;
 
-    /* Text colors */
-    --color-text-primary: #202122;
-    --color-text-secondary: #54595d;
-    --color-text-muted: #72777d;
-    --color-text-inverse: #ffffff;
+    /* Text colors - Deep navy ink */
+    --color-text-primary: #1A1A2E;
+    --color-text-secondary: #3D3D5C;
+    --color-text-muted: #6B6B8A;
+    --color-text-inverse: #FDF8F3;
 
-    /* Wikipedia blue - links and primary actions */
-    --color-primary: #3366cc;
-    --color-primary-hover: #2a4b8d;
-    --color-primary-light: #eaf3ff;
+    /* Antique Gold - Primary accent */
+    --color-primary: #B8860B;
+    --color-primary-hover: #9A7209;
+    --color-primary-light: #FFF3D6;
 
     /* Gamification accent colors */
-    --color-success: #14866d;
-    --color-success-bg: #d5fdf4;
-    --color-success-glow: rgba(20, 134, 109, 0.4);
+    --color-success: #2E7D32;
+    --color-success-bg: #E8F5E9;
+    --color-success-glow: rgba(46, 125, 50, 0.4);
 
-    --color-error: #d73333;
-    --color-error-bg: #fee7e6;
-    --color-error-glow: rgba(215, 51, 51, 0.4);
+    --color-error: #C62828;
+    --color-error-bg: #FFEBEE;
+    --color-error-glow: rgba(198, 40, 40, 0.4);
 
-    --color-warning: #ac6600;
-    --color-warning-bg: #fef6e7;
+    --color-warning: #F57C00;
+    --color-warning-bg: #FFF3E0;
 
-    --color-streak: #ff6b35;
-    --color-streak-glow: rgba(255, 107, 53, 0.5);
+    --color-streak: #D84315;
+    --color-streak-glow: rgba(216, 67, 21, 0.5);
 
     /* Gold for achievements and rankings */
-    --color-gold: #f5c518;
-    --color-gold-glow: rgba(245, 197, 24, 0.5);
-    --color-silver: #c0c0c0;
-    --color-bronze: #cd7f32;
+    --color-gold: #C9A227;
+    --color-gold-glow: rgba(201, 162, 39, 0.5);
+    --color-silver: #9E9E9E;
+    --color-bronze: #8D6E63;
 
-    /* Borders and dividers */
-    --color-border: #a2a9b1;
-    --color-border-light: #c8ccd1;
-    --color-border-subtle: #eaecf0;
+    /* Borders and dividers - Ink-like */
+    --color-border: #1A1A2E;
+    --color-border-light: #3D3D5C;
+    --color-border-subtle: #E0D6C8;
 
     /* ============================================
-     TYPOGRAPHY
+     TYPOGRAPHY - Classic Scholarly Fonts
      ============================================ */
 
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-        'Helvetica Neue', Arial, sans-serif;
-    --font-serif: 'Linux Libertine', 'Georgia', 'Times', serif;
+    --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-serif: 'EB Garamond', 'Georgia', 'Times New Roman', serif;
     --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
 
     /* Font sizes - fluid typography */
@@ -163,68 +162,123 @@
 }
 
 /* ============================================
-   DARK MODE
+   DARK THEMES - User Selectable
    ============================================ */
 
-/* Dark mode via class (for manual toggle) */
-html.dark {
-    /* Background tiers - inverted */
-    --color-bg-primary: #1a1a2e;
-    --color-bg-secondary: #16162a;
-    --color-bg-tertiary: #252550;
-    --color-bg-highlight: #2d2d44;
+/* Theme 1: Deep Forest Library */
+html.dark-forest {
+    --color-bg-primary: #1A2318;
+    --color-bg-secondary: #151D14;
+    --color-bg-tertiary: #243020;
+    --color-bg-highlight: #2A3826;
 
-    /* Text colors - inverted */
-    --color-text-primary: #e8e8e8;
-    --color-text-secondary: #b8b8c8;
-    --color-text-muted: #8888a0;
-    --color-text-inverse: #1a1a2e;
+    --color-text-primary: #E8E4D9;
+    --color-text-secondary: #C8C4B8;
+    --color-text-muted: #98947A;
+    --color-text-inverse: #1A2318;
 
-    /* Primary adjusts for dark */
-    --color-primary: #6366f1;
-    --color-primary-hover: #818cf8;
-    --color-primary-light: rgba(99, 102, 241, 0.15);
+    --color-primary: #C9A227;
+    --color-primary-hover: #E0B830;
+    --color-primary-light: rgba(201, 162, 39, 0.2);
 
-    /* Gamification colors - slightly brighter */
-    --color-success-bg: rgba(20, 134, 109, 0.2);
-    --color-error-bg: rgba(215, 51, 51, 0.2);
-    --color-warning-bg: rgba(172, 102, 0, 0.2);
+    --color-success-bg: rgba(46, 125, 50, 0.25);
+    --color-error-bg: rgba(198, 40, 40, 0.25);
+    --color-warning-bg: rgba(245, 124, 0, 0.25);
 
-    /* Borders - darker */
-    --color-border: #4a4a6a;
-    --color-border-light: #3a3a5a;
-    --color-border-subtle: #2a2a4a;
+    --color-border: #3D4A38;
+    --color-border-light: #2D3A28;
+    --color-border-subtle: #243020;
 
-    /* Shadows - adjusted for dark */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 8px 10px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Auto dark mode via system preference */
+/* Theme 2: Midnight Navy */
+html.dark-navy {
+    --color-bg-primary: #0F1419;
+    --color-bg-secondary: #0A0E12;
+    --color-bg-tertiary: #1A2332;
+    --color-bg-highlight: #1E2940;
+
+    --color-text-primary: #F0EDE5;
+    --color-text-secondary: #C8C4BC;
+    --color-text-muted: #8A8880;
+    --color-text-inverse: #0F1419;
+
+    --color-primary: #D4A017;
+    --color-primary-hover: #E8B82A;
+    --color-primary-light: rgba(212, 160, 23, 0.2);
+
+    --color-success-bg: rgba(46, 125, 50, 0.25);
+    --color-error-bg: rgba(198, 40, 40, 0.25);
+    --color-warning-bg: rgba(245, 124, 0, 0.25);
+
+    --color-border: #2E3A4A;
+    --color-border-light: #1E2A3A;
+    --color-border-subtle: #1A2332;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Theme 3: Charcoal & Cream (Default Dark) */
+html.dark-charcoal,
+html.dark {
+    --color-bg-primary: #1C1C1E;
+    --color-bg-secondary: #151517;
+    --color-bg-tertiary: #2C2C2E;
+    --color-bg-highlight: #3C3C3E;
+
+    --color-text-primary: #FAFAF5;
+    --color-text-secondary: #D0D0C8;
+    --color-text-muted: #9A9A92;
+    --color-text-inverse: #1C1C1E;
+
+    --color-primary: #E8B923;
+    --color-primary-hover: #F5C936;
+    --color-primary-light: rgba(232, 185, 35, 0.2);
+
+    --color-success-bg: rgba(46, 125, 50, 0.25);
+    --color-error-bg: rgba(198, 40, 40, 0.25);
+    --color-warning-bg: rgba(245, 124, 0, 0.25);
+
+    --color-border: #3C3C3E;
+    --color-border-light: #2C2C2E;
+    --color-border-subtle: #252527;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Auto dark mode via system preference (defaults to Charcoal) */
 @media (prefers-color-scheme: dark) {
-    html:not(.light) {
-        --color-bg-primary: #1a1a2e;
-        --color-bg-secondary: #16162a;
-        --color-bg-tertiary: #252550;
-        --color-bg-highlight: #2d2d44;
-        --color-text-primary: #e8e8e8;
-        --color-text-secondary: #b8b8c8;
-        --color-text-muted: #8888a0;
-        --color-text-inverse: #1a1a2e;
-        --color-primary: #6366f1;
-        --color-primary-hover: #818cf8;
-        --color-primary-light: rgba(99, 102, 241, 0.15);
-        --color-success-bg: rgba(20, 134, 109, 0.2);
-        --color-error-bg: rgba(215, 51, 51, 0.2);
-        --color-warning-bg: rgba(172, 102, 0, 0.2);
-        --color-border: #4a4a6a;
-        --color-border-light: #3a3a5a;
-        --color-border-subtle: #2a2a4a;
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
-        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5), 0 8px 10px rgba(0, 0, 0, 0.4);
+    html:not(.light):not(.dark-forest):not(.dark-navy):not(.dark-charcoal) {
+        --color-bg-primary: #1C1C1E;
+        --color-bg-secondary: #151517;
+        --color-bg-tertiary: #2C2C2E;
+        --color-bg-highlight: #3C3C3E;
+        --color-text-primary: #FAFAF5;
+        --color-text-secondary: #D0D0C8;
+        --color-text-muted: #9A9A92;
+        --color-text-inverse: #1C1C1E;
+        --color-primary: #E8B923;
+        --color-primary-hover: #F5C936;
+        --color-primary-light: rgba(232, 185, 35, 0.2);
+        --color-success-bg: rgba(46, 125, 50, 0.25);
+        --color-error-bg: rgba(198, 40, 40, 0.25);
+        --color-warning-bg: rgba(245, 124, 0, 0.25);
+        --color-border: #3C3C3E;
+        --color-border-light: #2C2C2E;
+        --color-border-subtle: #252527;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.5);
     }
 }

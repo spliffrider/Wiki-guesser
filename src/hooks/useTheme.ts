@@ -1,32 +1,51 @@
-// Wiki Guesser - Theme Hook
+// Wiki Guesser - Theme Hook with Multiple Dark Theme Support
 
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 
-type Theme = 'light' | 'dark' | 'system';
+export type DarkTheme = 'dark-forest' | 'dark-navy' | 'dark-charcoal';
+export type Theme = 'light' | DarkTheme | 'system';
+
+const DARK_THEMES: DarkTheme[] = ['dark-forest', 'dark-navy', 'dark-charcoal'];
+const ALL_THEME_CLASSES = ['light', 'dark', ...DARK_THEMES];
+
+export const THEME_OPTIONS: { value: Theme; label: string; icon: string }[] = [
+    { value: 'light', label: 'Light', icon: '☀️' },
+    { value: 'dark-charcoal', label: 'Charcoal', icon: '🌑' },
+    { value: 'dark-navy', label: 'Navy', icon: '🌊' },
+    { value: 'dark-forest', label: 'Forest', icon: '🌲' },
+    { value: 'system', label: 'System', icon: '💻' },
+];
 
 export function useTheme() {
     const [theme, setTheme] = useState<Theme>('system');
-    const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+    const [isDark, setIsDark] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     // Apply theme to document
     const applyTheme = useCallback((newTheme: Theme) => {
         const root = document.documentElement;
 
-        if (newTheme === 'dark') {
-            root.classList.add('dark');
-            root.classList.remove('light');
-            setResolvedTheme('dark');
-        } else if (newTheme === 'light') {
+        // Remove all theme classes
+        ALL_THEME_CLASSES.forEach(cls => root.classList.remove(cls));
+
+        if (newTheme === 'light') {
             root.classList.add('light');
-            root.classList.remove('dark');
-            setResolvedTheme('light');
+            setIsDark(false);
+        } else if (DARK_THEMES.includes(newTheme as DarkTheme)) {
+            root.classList.add(newTheme);
+            setIsDark(true);
         } else {
-            // System preference
-            root.classList.remove('light', 'dark');
+            // System preference - default to charcoal for dark
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            setResolvedTheme(prefersDark ? 'dark' : 'light');
+            if (prefersDark) {
+                // Don't add a class, let CSS media query handle it
+                setIsDark(true);
+            } else {
+                root.classList.add('light');
+                setIsDark(false);
+            }
         }
     }, []);
 
@@ -38,12 +57,13 @@ export function useTheme() {
         const initialTheme = saved || 'system';
         setTheme(initialTheme);
         applyTheme(initialTheme);
+        setMounted(true);
 
         // Listen for system preference changes
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const handleChange = () => {
             if (theme === 'system') {
-                setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
+                setIsDark(mediaQuery.matches);
             }
         };
 
@@ -58,15 +78,29 @@ export function useTheme() {
     }, [applyTheme]);
 
     const toggleTheme = useCallback(() => {
-        const next = resolvedTheme === 'dark' ? 'light' : 'dark';
-        setThemeValue(next);
-    }, [resolvedTheme, setThemeValue]);
+        // Simple toggle between light and current dark theme (or charcoal as default)
+        if (isDark) {
+            setThemeValue('light');
+        } else {
+            // If coming from light, use the last dark theme or default to charcoal
+            const lastDark = localStorage.getItem('wiki-guesser-last-dark') as DarkTheme | null;
+            setThemeValue(lastDark || 'dark-charcoal');
+        }
+    }, [isDark, setThemeValue]);
+
+    const setDarkTheme = useCallback((darkTheme: DarkTheme) => {
+        localStorage.setItem('wiki-guesser-last-dark', darkTheme);
+        setThemeValue(darkTheme);
+    }, [setThemeValue]);
 
     return {
         theme,
-        resolvedTheme,
         setTheme: setThemeValue,
+        setDarkTheme,
         toggleTheme,
-        isDark: resolvedTheme === 'dark',
+        isDark,
+        mounted,
+        darkThemes: DARK_THEMES,
+        themeOptions: THEME_OPTIONS,
     };
 }

@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { EB_Garamond, Lato } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+
+const ebGaramond = EB_Garamond({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif",
+  weight: ["400", "500", "600", "700"],
+});
+
+const lato = Lato({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+  weight: ["400", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Wiki Guesser - Guess the Wikipedia Article",
@@ -15,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6366f1",
+  themeColor: "#B8860B",
   width: "device-width",
   initialScale: 1,
 };
@@ -26,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${ebGaramond.variable} ${lato.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
@@ -38,5 +53,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

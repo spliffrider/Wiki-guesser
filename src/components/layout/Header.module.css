@@ -240,3 +240,53 @@
     border-color: var(--color-primary);
     transform: rotate(20deg);
 }
+
+/* Theme selector dropdown */
+.themeSelector {
+    position: relative;
+}
+
+.themeDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--space-2);
+    background-color: var(--color-bg-primary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: 4px 4px 0 var(--color-border);
+    min-width: 160px;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease;
+    z-index: var(--z-dropdown);
+}
+
+.themeOption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.themeOption:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.themeOption.active {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
+}
+
+.themeOptionIcon {
+    font-size: var(--text-base);
+}

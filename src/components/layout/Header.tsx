@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme, THEME_OPTIONS, Theme } from '@/hooks/useTheme';
 import { getAvatarEmoji } from '@/lib/avatars';
 import { RewardStar } from './RewardStar';
 import styles from './Header.module.css';
@@ -13,12 +13,21 @@ import styles from './Header.module.css';
 export function Header() {
     const { user, profile, signOut, isLoading } = useAuth();
     const [showDropdown, setShowDropdown] = useState(false);
-    const { toggleTheme, isDark } = useTheme();
+    const [showThemeDropdown, setShowThemeDropdown] = useState(false);
+    const { theme, setTheme, isDark, mounted } = useTheme();
 
     const handleSignOut = async () => {
         await signOut();
         setShowDropdown(false);
     };
+
+    const handleThemeSelect = (newTheme: Theme) => {
+        setTheme(newTheme);
+        setShowThemeDropdown(false);
+    };
+
+    // Get current theme icon
+    const currentThemeOption = THEME_OPTIONS.find(opt => opt.value === theme) || THEME_OPTIONS[0];
 
     return (
         <header className={styles.header}>
@@ -30,13 +39,31 @@ export function Header() {
                 <nav className={styles.nav}>
                     {user && <RewardStar />}
 
-                    <button
-                        onClick={toggleTheme}
-                        className={styles.themeToggle}
-                        aria-label="Toggle theme"
-                    >
-                        {isDark ? '☀️' : '🌙'}
-                    </button>
+                    {/* Theme selector */}
+                    <div className={styles.themeSelector}>
+                        <button
+                            onClick={() => setShowThemeDropdown(!showThemeDropdown)}
+                            className={styles.themeToggle}
+                            aria-label="Select theme"
+                        >
+                            {mounted ? (isDark ? '🌙' : '☀️') : '🌙'}
+                        </button>
+
+                        {showThemeDropdown && (
+                            <div className={styles.themeDropdown}>
+                                {THEME_OPTIONS.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={`${styles.themeOption} ${theme === option.value ? styles.active : ''}`}
+                                        onClick={() => handleThemeSelect(option.value)}
+                                    >
+                                        <span className={styles.themeOptionIcon}>{option.icon}</span>
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     {isLoading ? (
                         <div className={styles.loading}>
@@ -110,4 +137,3 @@ export function Header() {
         </header>
     );
 }
-
