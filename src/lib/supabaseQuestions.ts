@@ -123,12 +123,18 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
         const supabase = getSupabaseClient();
         const limit = count * 3;
 
-        // 1. Fetch from main table
-        const { data: mainData, error: mainError } = await supabase
-            .from('odd_wiki_out_questions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(limit);
+        // TEMPORARY TEST: Direct REST API call bypassing Supabase client
+        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/odd_wiki_out_questions?select=*&order=created_at.desc&limit=${limit}`;
+        const headers = {
+            'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`
+        };
+
+        const response = await fetch(url, { headers });
+        const mainData = response.ok ? await response.json() : null;
+        const mainError = response.ok ? null : { message: `HTTP ${response.status}` };
+
+        console.log('[TEST] Direct fetch result:', { ok: response.ok, status: response.status, dataLength: mainData?.length });
 
         if (mainError) console.error('[supabaseQuestions] Error fetching main odd_wiki_out:', mainError.message);
 
