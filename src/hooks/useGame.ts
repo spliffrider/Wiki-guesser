@@ -175,6 +175,21 @@ export function useGame(): UseGameReturn {
                 getRandomWikiLinks(wikiLinksCount),
             ]);
 
+            // If wiki_what has no data, replace those rounds with wiki_or_fiction
+            // (wiki_what has no JSON fallback, so we need to handle this case)
+            let actualCategories = [...roundCategories];
+            if (wikiWhatRoundData.length === 0 && wikiWhatCount > 0) {
+                console.log('[useGame] No wiki_what questions available, substituting with wiki_or_fiction');
+                // Fetch additional wiki_or_fiction questions to replace wiki_what rounds
+                const additionalWikiOrFiction = await getRandomWikiOrFiction(wikiWhatCount);
+                wikiOrFictionQuestions.push(...additionalWikiOrFiction);
+
+                // Replace wiki_what with wiki_or_fiction in the categories
+                actualCategories = roundCategories.map(cat =>
+                    cat === 'wiki_what' ? 'wiki_or_fiction' : cat
+                );
+            }
+
             // Track indices for each category
             let wikiWhatIndex = 0;
             let oddWikiOutIndex = 0;
@@ -183,7 +198,7 @@ export function useGame(): UseGameReturn {
             let wikiLinksIndex = 0;
 
             // Create rounds with category-specific data
-            const rounds: Round[] = roundCategories.map((category, index) => {
+            const rounds: Round[] = actualCategories.map((category, index) => {
                 const baseRound = {
                     roundNumber: index + 1,
                     timeLimit: DIFFICULTY_CONFIG[difficulty].timeLimit,
