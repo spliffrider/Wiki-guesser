@@ -67,7 +67,7 @@ export default function HomePage() {
         <div className={styles.howToPlay}>
           <h3 className={styles.howToPlayTitle}>How to Play</h3>
           <ol className={styles.howToPlayList}>
-            <li>You'll see content from a Wikipedia article (images, text, or both)</li>
+            <li>You&apos;ll see content from a Wikipedia article (images, text, or both)</li>
             <li>Type your guess for what the article is about</li>
             <li>Earn points for correct answers - faster = more points!</li>
             <li>Build streaks for bonus multipliers 🔥</li>

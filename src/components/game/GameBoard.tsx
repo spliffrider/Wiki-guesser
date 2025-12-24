@@ -71,6 +71,7 @@ export function GameBoard({
 
     // Sync with stored preference
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSoundEnabled(!isMuted());
     }, [isMuted]);
 

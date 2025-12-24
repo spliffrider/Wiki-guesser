@@ -75,9 +75,10 @@ export function useUGC() {
                 questionsCurated: curatedCount || 0,
                 recentRewards: rewards || []
             };
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
             console.error('[useUGC] Error fetching summary:', err);
-            setError(err.message);
+            setError(message);
             return null;
         } finally {
             setIsLoading(false);
@@ -106,10 +107,11 @@ export function useUGC() {
             if (error) throw error;
 
             return { data, error: null };
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
             console.error('[useUGC] Error submitting question:', err);
-            setError(err.message);
-            return { error: err.message };
+            setError(message);
+            return { error: message };
         } finally {
             setIsLoading(false);
         }
@@ -126,9 +128,10 @@ export function useUGC() {
 
             if (error) throw error;
             return data || [];
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
             console.error('[useUGC] Error fetching voting questions:', err);
-            setError(err.message);
+            setError(message);
             return [];
         } finally {
             setIsLoading(false);
@@ -147,9 +150,10 @@ export function useUGC() {
 
             if (error) throw error;
             return data || [];
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
             console.error('[useUGC] Error fetching moderation questions:', err);
-            setError(err.message);
+            setError(message);
             return [];
         } finally {
             setIsLoading(false);
@@ -178,9 +182,10 @@ export function useUGC() {
             }
 
             return { error: null };
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
             console.error('[useUGC] Error voting:', err);
-            return { error: err.message };
+            return { error: message };
         }
     };
 
@@ -209,9 +214,10 @@ export function useUGC() {
 
             if (error) throw error;
             return { error: null };
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
             console.error('[useUGC] Error reviewing question:', err);
-            return { error: err.message };
+            return { error: message };
         } finally {
             setIsLoading(false);
         }

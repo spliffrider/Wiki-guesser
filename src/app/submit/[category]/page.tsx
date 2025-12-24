@@ -30,6 +30,7 @@ export default function CategorySubmitPage({ params }: PageProps) {
         return <div>Category not found</div>;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const renderFields = (props: any) => {
         switch (category) {
             case 'wiki_what': return <WikiWhatFields {...props} />;
@@ -52,6 +53,7 @@ export default function CategorySubmitPage({ params }: PageProps) {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const validate = (data: any) => {
         switch (category) {
             case 'wiki_what':

@@ -3,6 +3,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useEffect, Suspense, useRef } from 'react';
 import { useGame } from '@/hooks/useGame';
 import { useSaveGame } from '@/hooks/useSaveGame';
@@ -96,7 +97,7 @@ function SinglePlayerGame() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <a href="/" className={styles.logo}>Wiki<span>Guesser</span></a>
+                <Link href="/" className={styles.logo}>Wiki<span>Guesser</span></Link>
             </header>
 
             <main className={styles.main}>

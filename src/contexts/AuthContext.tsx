@@ -104,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Update profile with username
             // Using 'as any' to bypass strict Supabase type inference that causes 'never' type error on Vercel
             await (supabase
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .from('profiles') as any)
                 .update({ username })
                 .eq('id', data.user.id);
@@ -128,13 +129,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
 
             console.log('[Auth] Calling Supabase auth...');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const result = await Promise.race([authPromise, timeoutPromise]) as any;
 
             console.log('[Auth] Sign in result:', result.error ? result.error.message : 'success');
             return { error: result.error };
-        } catch (err: any) {
-            console.error('[Auth] Sign in exception:', err.message);
-            return { error: { message: err.message || 'Network error - please try again' } as any };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Unknown error';
+            console.error('[Auth] Sign in exception:', message);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return { error: { message: message || 'Network error - please try again' } as any };
         }
     };
 

@@ -1,6 +1,7 @@
 // Wiki Guesser - Odd Wiki Out Fields
 import styles from '../QuestionForm.module.css';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function OddWikiOutFields({ data, updateData }: any) {
     return (
         <>

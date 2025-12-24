@@ -50,7 +50,7 @@ export default function SignupPage() {
                         </Link>
                         <h1 className={styles.title}>Check your email!</h1>
                         <p className={styles.subtitle}>
-                            We've sent you a confirmation link. Click it to activate your account.
+                            We&apos;ve sent you a confirmation link. Click it to activate your account.
                         </p>
                     </div>
                     <div className={styles.footer}>

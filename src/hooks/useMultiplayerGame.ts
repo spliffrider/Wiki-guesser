@@ -49,6 +49,7 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
     const [error, setError] = useState<string | null>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const supabase = getSupabaseClient();
+    const roomId = state.room?.id;
 
     // Fetch initial room state
     const fetchRoomState = useCallback(async () => {
@@ -77,18 +78,19 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
 
     // Initial load
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchRoomState();
     }, [fetchRoomState]);
 
     // Subscribe to realtime updates
     useEffect(() => {
-        if (!state.room?.id) return;
+        if (!roomId) return;
 
         const roomChannel = supabase
-            .channel(`room:${state.room.id}`)
+            .channel(`room:${roomId}`)
             .on(
                 'postgres_changes',
-                { event: '*', schema: 'public', table: 'game_rooms', filter: `id=eq.${state.room.id}` },
+                { event: '*', schema: 'public', table: 'game_rooms', filter: `id=eq.${roomId}` },
                 (payload) => {
                     const newRoom = payload.new as GameRoom;
                     setState(prev => {
@@ -127,20 +129,20 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
             )
             .on(
                 'postgres_changes',
-                { event: '*', schema: 'public', table: 'room_players', filter: `room_id=eq.${state.room.id}` },
+                { event: '*', schema: 'public', table: 'room_players', filter: `room_id=eq.${roomId}` },
                 () => {
                     // Refresh players list
-                    getRoomPlayers(state.room!.id).then(players => {
+                    getRoomPlayers(roomId!).then(players => {
                         setState(prev => ({ ...prev, players }));
                     });
                 }
             )
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'room_answers', filter: `room_id=eq.${state.room.id}` },
+                { event: 'INSERT', schema: 'public', table: 'room_answers', filter: `room_id=eq.${roomId}` },
                 () => {
                     // Someone answered - could show "X answered!" notification
-                    getRoomPlayers(state.room!.id).then(players => {
+                    getRoomPlayers(roomId!).then(players => {
                         setState(prev => ({ ...prev, players }));
                     });
                 }
@@ -150,7 +152,7 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
         return () => {
             supabase.removeChannel(roomChannel);
         };
-    }, [state.room?.id, supabase]);
+    }, [roomId, supabase]);
 
     // Timer effect
     useEffect(() => {
@@ -183,14 +185,14 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
 
     // Actions
     const setReady = useCallback(async (ready: boolean) => {
-        if (!state.room?.id) return;
-        await toggleReady(state.room.id, userId, ready);
-    }, [state.room?.id, userId]);
+        if (!roomId) return;
+        await toggleReady(roomId, userId, ready);
+    }, [roomId, userId]);
 
     const startGameAction = useCallback(async () => {
-        if (!state.room?.id) return { success: false, error: 'No room' };
-        return await startGame(state.room.id, userId);
-    }, [state.room?.id, userId]);
+        if (!roomId) return { success: false, error: 'No room' };
+        return await startGame(roomId, userId);
+    }, [roomId, userId]);
 
     const answer = useCallback(async (answerText: string) => {
         if (!state.room?.id || !state.currentQuestion || state.hasAnswered) return;
@@ -214,19 +216,19 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
     }, [state.room, state.currentQuestion, state.hasAnswered, state.roundStartTime, userId]);
 
     const advanceRound = useCallback(async () => {
-        if (!state.room?.id) return;
+        if (!roomId) return;
 
-        const { finished } = await nextRound(state.room.id);
+        const { finished } = await nextRound(roomId);
 
         if (finished) {
             setState(prev => ({ ...prev, phase: 'finished' }));
         }
-    }, [state.room?.id]);
+    }, [roomId]);
 
     const leave = useCallback(async () => {
-        if (!state.room?.id) return;
-        await leaveRoom(state.room.id, userId);
-    }, [state.room?.id, userId]);
+        if (!roomId) return;
+        await leaveRoom(roomId, userId);
+    }, [roomId, userId]);
 
     const isHost = state.players.find(p => p.user_id === userId)?.is_host || false;
     const myPlayer = state.players.find(p => p.user_id === userId);

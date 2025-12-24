@@ -1,6 +1,7 @@
 // Wiki Guesser - When In Wiki Fields
 import styles from '../QuestionForm.module.css';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function WhenInWikiFields({ data, updateData }: any) {
     return (
         <>

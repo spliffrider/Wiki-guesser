@@ -9,6 +9,14 @@ import {
     WikiLinksData,
     WikiTopic,
 } from '@/types';
+import {
+    UserSubmittedQuestion,
+    OddWikiOutQuestionData,
+    WhenInWikiQuestionData,
+    WikiOrFictionQuestionData,
+    WikiLinksQuestionData,
+    WikiWhatQuestionData,
+} from '../types/ugc';
 
 // Database row types (snake_case from Supabase)
 interface OddWikiOutRow {
@@ -144,10 +152,11 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
             source: row.wikipedia_url,
         }));
 
-        const ugcMapped = (ugcData || []).map((row: any) => {
+        const ugcMapped = (ugcData || []).map((_row: unknown) => {
+            const row = _row as UserSubmittedQuestion;
             // Mapping JSONB question_data to game format
             // In UGC schema, keys are camelCase: items, impostorIndex, connection, topic
-            const q = row.question_data;
+            const q = row.question_data as OddWikiOutQuestionData;
             return {
                 items: q.items,
                 impostorIndex: q.impostorIndex,
@@ -214,8 +223,9 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
             source: row.wikipedia_url,
         }));
 
-        const ugcMapped = (ugcData || []).map((row: any) => {
-            const q = row.question_data;
+        const ugcMapped = (ugcData || []).map((_row: unknown) => {
+            const row = _row as UserSubmittedQuestion;
+            const q = row.question_data as WhenInWikiQuestionData;
             return {
                 event: q.event,
                 correctYear: q.correctYear,
@@ -281,8 +291,9 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
             source: row.wikipedia_url,
         }));
 
-        const ugcMapped = (ugcData || []).map((row: any) => {
-            const q = row.question_data;
+        const ugcMapped = (ugcData || []).map((_row: unknown) => {
+            const row = _row as UserSubmittedQuestion;
+            const q = row.question_data as WikiOrFictionQuestionData;
             return {
                 statement: q.statement,
                 isTrue: q.isTrue,
@@ -348,8 +359,9 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
             source: row.wikipedia_url,
         }));
 
-        const ugcMapped = (ugcData || []).map((row: any) => {
-            const q = row.question_data;
+        const ugcMapped = (ugcData || []).map((_row: unknown) => {
+            const row = _row as UserSubmittedQuestion;
+            const q = row.question_data as WikiLinksQuestionData;
             return {
                 titles: q.titles,
                 connection: q.connection,
@@ -420,8 +432,9 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
             wrongOptions: row.wrong_options,
         }));
 
-        const ugcMapped = (ugcData || []).map((row: any) => {
-            const q = row.question_data;
+        const ugcMapped = (ugcData || []).map((_row: unknown) => {
+            const row = _row as UserSubmittedQuestion;
+            const q = row.question_data as WikiWhatQuestionData;
             return {
                 topic: {
                     id: row.id,

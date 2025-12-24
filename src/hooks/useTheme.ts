@@ -55,6 +55,7 @@ export function useTheme() {
 
         const saved = localStorage.getItem('wiki-guesser-theme') as Theme | null;
         const initialTheme = saved || 'system';
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTheme(initialTheme);
         applyTheme(initialTheme);
         setMounted(true);

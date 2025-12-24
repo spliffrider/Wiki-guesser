@@ -14,11 +14,15 @@ interface QuestionFormProps {
     title: string;
     icon: string;
     children: (props: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         updateData: (updates: any) => void;
         isValid: boolean;
     }) => React.ReactNode;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialData: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     validate: (data: any) => boolean;
 }
 
@@ -36,7 +40,9 @@ export function QuestionForm({
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData = (updates: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setFormData((prev: any) => ({ ...prev, ...updates }));
     };
 
@@ -73,7 +79,7 @@ export function QuestionForm({
                 <div style={{ textAlign: 'center', padding: '2rem' }}>
                     <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
                     <h2 className={styles.title}>Submitted!</h2>
-                    <p>Your question has been sent for review. You'll earn points once it's approved!</p>
+                    <p>Your question has been sent for review. You&apos;ll earn points once it&apos;s approved!</p>
                 </div>
             </div>
         );

@@ -13,6 +13,7 @@ export function RewardStar() {
 
     useEffect(() => {
         if (profile?.reward_points !== undefined && profile.reward_points !== points) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPoints(profile.reward_points);
             setAnimate(true);
             const timer = setTimeout(() => setAnimate(false), 300);

@@ -10,6 +10,7 @@ interface QuestionCardProps {
 }
 
 export function QuestionCard({ question }: QuestionCardProps) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = question.question_data as any;
 
     const renderContent = () => {
@@ -18,7 +19,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
         return (
             <div className={styles.content}>
                 {data.title && <h3 className={styles.questionTitle}>{data.title}</h3>}
-                {data.statement && <p className={styles.statement}>"{data.statement}"</p>}
+                {data.statement && <p className={styles.statement}>&quot;{data.statement}&quot;</p>}
                 {data.event && <p className={styles.event}>{data.event}</p>}
 
                 {/* Connection/Explanation usually exists */}

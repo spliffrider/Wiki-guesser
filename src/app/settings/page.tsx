@@ -80,8 +80,9 @@ export default function SettingsPage() {
             } else {
                 setMessage({ type: 'success', text: 'Settings saved successfully!' });
             }
-        } catch (err: any) {
-            setMessage({ type: 'error', text: err.message || 'Failed to save settings' });
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Failed to save settings';
+            setMessage({ type: 'error', text: message });
         } finally {
             setSaving(false);
         }
