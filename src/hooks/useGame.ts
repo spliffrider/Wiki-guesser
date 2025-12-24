@@ -213,6 +213,9 @@ export function useGame(): UseGameReturn {
                 switch (category) {
                     case 'wiki_what': {
                         const roundData = wikiWhatRoundData[wikiWhatIndex];
+                        if (!roundData) {
+                            throw new Error(`No wiki_what data at index ${wikiWhatIndex}. Available: ${wikiWhatRoundData.length}`);
+                        }
                         const allOptions = [roundData.topic.title, ...roundData.wrongOptions];
                         wikiWhatIndex++;
 
@@ -227,6 +230,9 @@ export function useGame(): UseGameReturn {
 
                     case 'odd_wiki_out': {
                         const data = oddWikiOutQuestions[oddWikiOutIndex];
+                        if (!data) {
+                            throw new Error(`No odd_wiki_out data at index ${oddWikiOutIndex}. Available: ${oddWikiOutQuestions.length}`);
+                        }
                         oddWikiOutIndex++;
                         // The options are the items themselves
                         return {
@@ -241,6 +247,9 @@ export function useGame(): UseGameReturn {
 
                     case 'when_in_wiki': {
                         const data = whenInWikiQuestions[whenInWikiIndex];
+                        if (!data) {
+                            throw new Error(`No when_in_wiki data at index ${whenInWikiIndex}. Available: ${whenInWikiQuestions.length}`);
+                        }
                         whenInWikiIndex++;
                         return {
                             ...baseRound,
@@ -254,6 +263,9 @@ export function useGame(): UseGameReturn {
 
                     case 'wiki_or_fiction': {
                         const data = wikiOrFictionQuestions[wikiOrFictionIndex];
+                        if (!data) {
+                            throw new Error(`No wiki_or_fiction data at index ${wikiOrFictionIndex}. Available: ${wikiOrFictionQuestions.length}`);
+                        }
                         wikiOrFictionIndex++;
                         return {
                             ...baseRound,
@@ -267,6 +279,9 @@ export function useGame(): UseGameReturn {
 
                     case 'wiki_links': {
                         const data = wikiLinksQuestions[wikiLinksIndex];
+                        if (!data) {
+                            throw new Error(`No wiki_links data at index ${wikiLinksIndex}. Available: ${wikiLinksQuestions.length}`);
+                        }
                         wikiLinksIndex++;
                         // Use the connection options as multiple choice
                         const options = data.connectionOptions || [data.connection];
