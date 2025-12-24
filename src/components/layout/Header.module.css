@@ -112,6 +112,23 @@
     font-weight: var(--font-weight-bold);
 }
 
+.avatarWrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+.loggedInIndicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background-color: #22c55e;
+    border: 2px solid var(--color-bg-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
+}
+
 .username {
     font-size: var(--text-sm);
     font-weight: var(--font-weight-medium);

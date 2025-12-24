@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
+import { getAvatarEmoji } from '@/lib/avatars';
 import { RewardStar } from './RewardStar';
 import styles from './Header.module.css';
 
@@ -45,8 +46,11 @@ export function Header() {
                                 className={styles.userButton}
                                 onClick={() => setShowDropdown(!showDropdown)}
                             >
-                                <span className={styles.avatar}>
-                                    {profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
+                                <span className={styles.avatarWrapper}>
+                                    <span className={styles.avatar}>
+                                        {getAvatarEmoji(profile?.avatar_url ?? null) || profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
+                                    </span>
+                                    <span className={styles.loggedInIndicator}></span>
                                 </span>
                                 <span className={styles.username}>
                                     {profile?.username || 'User'}
@@ -60,7 +64,14 @@ export function Header() {
                                         className={styles.dropdownItem}
                                         onClick={() => setShowDropdown(false)}
                                     >
-                                        Profile
+                                        👤 Profile
+                                    </Link>
+                                    <Link
+                                        href="/settings"
+                                        className={styles.dropdownItem}
+                                        onClick={() => setShowDropdown(false)}
+                                    >
+                                        ⚙️ Settings
                                     </Link>
                                     <Link
                                         href="/leaderboard"

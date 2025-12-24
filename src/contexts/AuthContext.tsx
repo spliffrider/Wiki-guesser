@@ -16,6 +16,7 @@ interface AuthContextType {
     signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
     signOut: () => Promise<void>;
     updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
+    updateEmail: (newEmail: string) => Promise<{ error: Error | null }>;
     refreshProfile: () => Promise<void>;
 }
 
@@ -161,6 +162,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(userProfile);
     };
 
+    const updateEmail = async (newEmail: string) => {
+        const { error } = await supabase.auth.updateUser({ email: newEmail });
+        return { error: error ? new Error(error.message) : null };
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -172,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 signIn,
                 signOut,
                 updateProfile,
+                updateEmail,
                 refreshProfile,
             }}
         >
