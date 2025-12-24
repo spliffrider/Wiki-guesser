@@ -25,36 +25,36 @@ export type RewardType =
 
 export interface UserSubmittedQuestion {
     id: string;
-    userId: string;
+    user_id: string;
     category: QuestionCategory;
-    questionData: QuestionData;
+    question_data: QuestionData;
     status: QuestionStatus;
-    submittedAt: string;
-    reviewedAt: string | null;
-    reviewedBy: string | null;
-    adminNotes: string | null;
+    submitted_at: string;
+    reviewed_at: string | null;
+    reviewed_by: string | null;
+    admin_notes: string | null;
     upvotes: number;
     downvotes: number;
-    createdAt: string;
-    updatedAt: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface QuestionVote {
     id: string;
-    userId: string;
-    questionId: string;
-    voteType: VoteType;
-    createdAt: string;
+    user_id: string;
+    question_id: string;
+    vote_type: VoteType;
+    created_at: string;
 }
 
 export interface UserReward {
     id: string;
-    userId: string;
-    rewardType: RewardType;
-    pointsEarned: number;
-    sourceQuestionId: string | null;
+    user_id: string;
+    reward_type: RewardType;
+    points_earned: number;
+    source_question_id: string | null;
     description: string | null;
-    createdAt: string;
+    created_at: string;
 }
 
 export interface AppConfig {
@@ -120,23 +120,24 @@ export type QuestionData =
 export interface PendingQuestionView {
     id: string;
     category: QuestionCategory;
-    questionData: QuestionData;
-    submittedAt: string;
+    question_data: QuestionData;
+    submitted_at: string;
     upvotes: number;
     downvotes: number;
-    submitterUsername: string;
-    submitterId: string;
+    submitter_username: string;
+    submitter_id: string;
 }
 
 export interface CurationCandidateView {
     id: string;
     category: QuestionCategory;
-    questionData: QuestionData;
+    question_data: QuestionData;
     upvotes: number;
     downvotes: number;
-    netVotes: number;
-    submittedAt: string;
-    submitterUsername: string;
+    net_votes: number;
+    submitted_at: string;
+    submitter_username: string;
+    approved_at: string | null; // Added this as likely needed
 }
 
 // -----------------------------------------------------------------------------

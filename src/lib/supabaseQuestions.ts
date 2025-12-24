@@ -85,39 +85,59 @@ function shuffleArray<T>(array: T[]): T[] {
  * @returns Array of OddWikiOutData
  */
 export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiOutData[]> {
-    // Skip Supabase calls during SSR
-    if (typeof window === 'undefined') {
-        return [];
-    }
+    if (typeof window === 'undefined') return [];
 
     try {
         const supabase = getSupabaseClient();
+        const limit = count * 3;
 
-        // Fetch more than needed, then shuffle and slice for true randomness
-        const { data, error } = await supabase
+        // 1. Fetch from main table
+        const { data: mainData, error: mainError } = await supabase
             .from('odd_wiki_out_questions')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(count * 3);
+            .limit(limit);
 
-        if (error) {
-            console.error('[supabaseQuestions] Error fetching odd_wiki_out:', error.message);
-            return [];
-        }
+        if (mainError) console.error('[supabaseQuestions] Error fetching main odd_wiki_out:', mainError.message);
 
-        if (!data || data.length === 0) {
-            return [];
-        }
+        // 2. Fetch from curated UGC
+        const { data: ugcData, error: ugcError } = await supabase
+            .from('user_submitted_questions')
+            .select('*')
+            .eq('status', 'curated')
+            .eq('category', 'odd_wiki_out')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-        // Shuffle and map to interface
-        const shuffled = shuffleArray(data as OddWikiOutRow[]).slice(0, count);
-        return shuffled.map((row) => ({
+        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC odd_wiki_out:', ugcError.message);
+
+        // 3. Map and Combine
+        const mainMapped = (mainData || []).map((row: OddWikiOutRow) => ({
             items: row.items,
             impostorIndex: row.impostor_index,
             connection: row.connection,
             topic: row.topic || '',
             source: row.wikipedia_url,
         }));
+
+        const ugcMapped = (ugcData || []).map((row: any) => {
+            // Mapping JSONB question_data to game format
+            // In UGC schema, keys are camelCase: items, impostorIndex, connection, topic
+            const q = row.question_data;
+            return {
+                items: q.items,
+                impostorIndex: q.impostorIndex,
+                connection: q.connection,
+                topic: q.topic || '',
+                source: `https://en.wikipedia.org/wiki/${encodeURIComponent(q.items?.[0] || '')}`, // Fallback source
+                isUGC: true, // Optional flag for UI
+                author: row.user_id // Could fetch username if needed
+            };
+        });
+
+        // 4. Shuffle combined pool
+        const combined = [...mainMapped, ...ugcMapped];
+        return shuffleArray(combined).slice(0, count);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomOddWikiOutFromDB:', err);
         return [];
@@ -135,30 +155,53 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
 
     try {
         const supabase = getSupabaseClient();
+        const limit = count * 3;
 
-        const { data, error } = await supabase
+        // 1. Fetch from main table
+        const { data: mainData, error: mainError } = await supabase
             .from('when_in_wiki_questions')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(count * 3);
+            .limit(limit);
 
-        if (error) {
-            console.error('[supabaseQuestions] Error fetching when_in_wiki:', error.message);
-            return [];
-        }
+        if (mainError) console.error('[supabaseQuestions] Error fetching main when_in_wiki:', mainError.message);
 
-        if (!data || data.length === 0) {
-            return [];
-        }
+        // 2. Fetch from curated UGC
+        const { data: ugcData, error: ugcError } = await supabase
+            .from('user_submitted_questions')
+            .select('*')
+            .eq('status', 'curated')
+            .eq('category', 'when_in_wiki')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-        const shuffled = shuffleArray(data as WhenInWikiRow[]).slice(0, count);
-        return shuffled.map((row) => ({
+        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC when_in_wiki:', ugcError.message);
+
+        // 3. Map and Combine
+        const mainMapped = (mainData || []).map((row: WhenInWikiRow) => ({
             event: row.event,
             correctYear: row.correct_year,
             yearOptions: row.year_options,
             topic: row.topic || '',
             source: row.wikipedia_url,
         }));
+
+        const ugcMapped = (ugcData || []).map((row: any) => {
+            const q = row.question_data;
+            return {
+                event: q.event,
+                correctYear: q.correctYear,
+                yearOptions: q.yearOptions,
+                topic: q.topic || '',
+                source: '', // No specific source stored usually for this type in simple form
+                isUGC: true
+            };
+        });
+
+        // 4. Shuffle combined pool
+        const combined = [...mainMapped, ...ugcMapped];
+        return shuffleArray(combined).slice(0, count);
+
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWhenInWikiFromDB:', err);
         return [];
@@ -176,30 +219,53 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
 
     try {
         const supabase = getSupabaseClient();
+        const limit = count * 3;
 
-        const { data, error } = await supabase
+        // 1. Fetch from main table
+        const { data: mainData, error: mainError } = await supabase
             .from('wiki_or_fiction_questions')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(count * 3);
+            .limit(limit);
 
-        if (error) {
-            console.error('[supabaseQuestions] Error fetching wiki_or_fiction:', error.message);
-            return [];
-        }
+        if (mainError) console.error('[supabaseQuestions] Error fetching main wiki_or_fiction:', mainError.message);
 
-        if (!data || data.length === 0) {
-            return [];
-        }
+        // 2. Fetch from curated UGC
+        const { data: ugcData, error: ugcError } = await supabase
+            .from('user_submitted_questions')
+            .select('*')
+            .eq('status', 'curated')
+            .eq('category', 'wiki_or_fiction')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-        const shuffled = shuffleArray(data as WikiOrFictionRow[]).slice(0, count);
-        return shuffled.map((row) => ({
+        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC wiki_or_fiction:', ugcError.message);
+
+        // 3. Map and Combine
+        const mainMapped = (mainData || []).map((row: WikiOrFictionRow) => ({
             statement: row.statement,
             isTrue: row.is_true,
             explanation: row.explanation,
             topic: row.topic || '',
             source: row.wikipedia_url,
         }));
+
+        const ugcMapped = (ugcData || []).map((row: any) => {
+            const q = row.question_data;
+            return {
+                statement: q.statement,
+                isTrue: q.isTrue,
+                explanation: q.explanation,
+                topic: q.topic || '',
+                source: q.source || '',
+                isUGC: true
+            };
+        });
+
+        // 4. Shuffle combined pool
+        const combined = [...mainMapped, ...ugcMapped];
+        return shuffleArray(combined).slice(0, count);
+
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiOrFictionFromDB:', err);
         return [];
@@ -217,30 +283,53 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
 
     try {
         const supabase = getSupabaseClient();
+        const limit = count * 3;
 
-        const { data, error } = await supabase
+        // 1. Fetch from main table
+        const { data: mainData, error: mainError } = await supabase
             .from('wiki_links_questions')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(count * 3);
+            .limit(limit);
 
-        if (error) {
-            console.error('[supabaseQuestions] Error fetching wiki_links:', error.message);
-            return [];
-        }
+        if (mainError) console.error('[supabaseQuestions] Error fetching main wiki_links:', mainError.message);
 
-        if (!data || data.length === 0) {
-            return [];
-        }
+        // 2. Fetch from curated UGC
+        const { data: ugcData, error: ugcError } = await supabase
+            .from('user_submitted_questions')
+            .select('*')
+            .eq('status', 'curated')
+            .eq('category', 'wiki_links')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-        const shuffled = shuffleArray(data as WikiLinksRow[]).slice(0, count);
-        return shuffled.map((row) => ({
+        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC wiki_links:', ugcError.message);
+
+        // 3. Map and Combine
+        const mainMapped = (mainData || []).map((row: WikiLinksRow) => ({
             titles: row.titles,
             connection: row.connection,
             connectionOptions: row.connection_options,
             topic: row.topic || '',
             source: row.wikipedia_url,
         }));
+
+        const ugcMapped = (ugcData || []).map((row: any) => {
+            const q = row.question_data;
+            return {
+                titles: q.titles,
+                connection: q.connection,
+                connectionOptions: q.connectionOptions,
+                topic: q.topic || '',
+                source: '', // Fallback
+                isUGC: true
+            };
+        });
+
+        // 4. Shuffle combined pool
+        const combined = [...mainMapped, ...ugcMapped];
+        return shuffleArray(combined).slice(0, count);
+
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiLinksFromDB:', err);
         return [];
@@ -259,34 +348,60 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
 
     try {
         const supabase = getSupabaseClient();
+        const limit = count * 3;
 
-        const { data, error } = await supabase
+        // 1. Fetch from main table
+        const { data: mainData, error: mainError } = await supabase
             .from('wiki_what_questions')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(count * 3);
+            .limit(limit);
 
-        if (error) {
-            console.error('[supabaseQuestions] Error fetching wiki_what:', error.message);
-            return [];
-        }
+        if (mainError) console.error('[supabaseQuestions] Error fetching main wiki_what:', mainError.message);
 
-        if (!data || data.length === 0) {
-            return [];
-        }
+        // 2. Fetch from curated UGC
+        const { data: ugcData, error: ugcError } = await supabase
+            .from('user_submitted_questions')
+            .select('*')
+            .eq('status', 'curated')
+            .eq('category', 'wiki_what')
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-        const shuffled = shuffleArray(data as WikiWhatRow[]).slice(0, count);
-        return shuffled.map((row) => ({
+        if (ugcError) console.error('[supabaseQuestions] Error fetching UGC wiki_what:', ugcError.message);
+
+        // 3. Map and Combine
+        const mainMapped = (mainData || []).map((row: WikiWhatRow) => ({
             topic: {
                 id: row.id,
                 title: row.title,
                 excerpt: row.excerpt,
                 imageUrl: row.image_url,
-                categories: [], // Not needed for this category
+                categories: [],
                 pageUrl: row.page_url,
             },
             wrongOptions: row.wrong_options,
         }));
+
+        const ugcMapped = (ugcData || []).map((row: any) => {
+            const q = row.question_data;
+            return {
+                topic: {
+                    id: row.id,
+                    title: q.title,
+                    excerpt: q.excerpt,
+                    imageUrl: q.imageUrl,
+                    categories: [],
+                    pageUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(q.title || '')}`,
+                    isUGC: true
+                } as WikiTopic,
+                wrongOptions: q.wrongOptions,
+            };
+        });
+
+        // 4. Shuffle combined pool
+        const combined = [...mainMapped, ...ugcMapped];
+        return shuffleArray(combined).slice(0, count);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiWhatFromDB:', err);
         return [];

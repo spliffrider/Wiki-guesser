@@ -7,7 +7,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
     UserSubmittedQuestion,
     SubmitQuestionRequest,
-    UserRewardSummary
+    UserRewardSummary,
+    VoteRequest,
+    AdminReviewRequest,
+    VoteType,
+    QuestionStatus,
+    PendingQuestionView,
+    CurationCandidateView
 } from '@/types/ugc';
 
 export function useUGC() {
@@ -109,10 +115,116 @@ export function useUGC() {
         }
     };
 
+    // Fetch questions for voting (approved candidates)
+    const getQuestionsForVoting = useCallback(async (): Promise<CurationCandidateView[]> => {
+        try {
+            setIsLoading(true);
+            const { data, error } = await supabase
+                .from('curation_candidates_view')
+                .select('*')
+                .limit(20);
+
+            if (error) throw error;
+            return data || [];
+        } catch (err: any) {
+            console.error('[useUGC] Error fetching voting questions:', err);
+            setError(err.message);
+            return [];
+        } finally {
+            setIsLoading(false);
+        }
+    }, [supabase]);
+
+    // Fetch questions for moderation (admin only)
+    const getQuestionsForModeration = useCallback(async (): Promise<PendingQuestionView[]> => {
+        if (!user) return [];
+        try {
+            setIsLoading(true);
+            const { data, error } = await supabase
+                .from('pending_questions_view')
+                .select('*')
+                .order('submitted_at', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (err: any) {
+            console.error('[useUGC] Error fetching moderation questions:', err);
+            setError(err.message);
+            return [];
+        } finally {
+            setIsLoading(false);
+        }
+    }, [user, supabase]);
+
+    // Vote on a question
+    const voteOnQuestion = async (request: VoteRequest) => {
+        if (!user) return { error: 'Not authenticated' };
+        try {
+            // We don't set loading here to allow optimistic UI in the component
+            const { error } = await supabase
+                .from('question_votes')
+                .insert({
+                    user_id: user.id,
+                    question_id: request.questionId,
+                    vote_type: request.voteType
+                });
+
+            if (error) {
+                // Handle duplicate vote gracefully
+                if (error.code === '23505') { // Unique violation
+                    return { error: 'You have already voted on this question.' };
+                }
+                throw error;
+            }
+
+            return { error: null };
+        } catch (err: any) {
+            console.error('[useUGC] Error voting:', err);
+            return { error: err.message };
+        }
+    };
+
+    // Admin: Review a question
+    const reviewQuestion = async (request: AdminReviewRequest) => {
+        if (!user) return { error: 'Not authenticated' };
+        try {
+            setIsLoading(true);
+
+            let error;
+            if (request.action === 'approve') {
+                const { error: rpcError } = await supabase.rpc('approve_question', {
+                    p_question_id: request.questionId,
+                    p_admin_id: user.id,
+                    p_notes: request.notes
+                });
+                error = rpcError;
+            } else {
+                const { error: rpcError } = await supabase.rpc('reject_question', {
+                    p_question_id: request.questionId,
+                    p_admin_id: user.id,
+                    p_notes: request.notes
+                });
+                error = rpcError;
+            }
+
+            if (error) throw error;
+            return { error: null };
+        } catch (err: any) {
+            console.error('[useUGC] Error reviewing question:', err);
+            return { error: err.message };
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return {
         isLoading,
         error,
         fetchUserSummary,
-        submitQuestion
+        submitQuestion,
+        getQuestionsForVoting,
+        getQuestionsForModeration,
+        voteOnQuestion,
+        reviewQuestion
     };
 }

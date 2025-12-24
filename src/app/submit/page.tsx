@@ -123,14 +123,14 @@ export default function SubmitHubPage() {
                                     <div key={reward.id} className={styles.rewardItem}>
                                         <div className={styles.rewardInfo}>
                                             <span className={styles.rewardDescription}>
-                                                {reward.description || reward.rewardType.replace(/_/g, ' ')}
+                                                {reward.description || reward.reward_type.replace(/_/g, ' ')}
                                             </span>
                                             <span className={styles.rewardDate}>
-                                                {new Date(reward.createdAt).toLocaleDateString()}
+                                                {new Date(reward.created_at).toLocaleDateString()}
                                             </span>
                                         </div>
                                         <span className={styles.rewardPoints}>
-                                            +{reward.pointsEarned}⭐
+                                            +{reward.points_earned}⭐
                                         </span>
                                     </div>
                                 ))}

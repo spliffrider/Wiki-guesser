@@ -1,0 +1,113 @@
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-4);
+}
+
+.title {
+    font-size: 2rem;
+    color: var(--color-text-primary);
+}
+
+.subtitle {
+    color: var(--color-text-secondary);
+}
+
+.denied {
+    text-align: center;
+    padding: var(--space-20);
+    color: var(--color-error);
+}
+
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.adminCard {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+}
+
+.badge {
+    background-color: var(--color-bg-tertiary);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.meta {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.cardContent {
+    background-color: var(--color-bg-secondary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    overflow-x: auto;
+}
+
+.jsonDump {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: var(--space-2) var(--space-6);
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.approve {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.reject {
+    background-color: var(--color-error);
+    color: white;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: var(--space-12);
+    color: var(--color-text-secondary);
+}
