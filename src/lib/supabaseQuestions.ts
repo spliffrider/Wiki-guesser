@@ -108,7 +108,7 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
     }
 }
 
-const QUERY_TIMEOUT_MS = 5000; // 5 second timeout
+const QUERY_TIMEOUT_MS = 15000; // 15 second timeout to handle cold starts or slow networks
 
 /**
  * Fetch random "Odd Wiki Out" questions from Supabase.
