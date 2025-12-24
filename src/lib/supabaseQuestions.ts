@@ -79,6 +79,30 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 /**
+ * Wrap a promise with a timeout to prevent silent hangs
+ */
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
+    let timeoutId: NodeJS.Timeout;
+    const timeoutPromise = new Promise<T>((resolve) => {
+        timeoutId = setTimeout(() => {
+            console.warn(`[supabaseQuestions] Query timed out after ${timeoutMs}ms, using fallback`);
+            resolve(fallback);
+        }, timeoutMs);
+    });
+
+    try {
+        const result = await Promise.race([promise, timeoutPromise]);
+        clearTimeout(timeoutId!);
+        return result;
+    } catch (err) {
+        clearTimeout(timeoutId!);
+        throw err;
+    }
+}
+
+const QUERY_TIMEOUT_MS = 5000; // 5 second timeout
+
+/**
  * Fetch random "Odd Wiki Out" questions from Supabase.
  * Falls back to empty array on error.
  * @param count Number of questions to fetch
@@ -87,7 +111,7 @@ function shuffleArray<T>(array: T[]): T[] {
 export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiOutData[]> {
     if (typeof window === 'undefined') return [];
 
-    try {
+    const fetchQuestions = async (): Promise<OddWikiOutData[]> => {
         const supabase = getSupabaseClient();
         const limit = count * 3;
 
@@ -138,6 +162,10 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
         return shuffleArray(combined).slice(0, count);
+    };
+
+    try {
+        return await withTimeout(fetchQuestions(), QUERY_TIMEOUT_MS, []);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomOddWikiOutFromDB:', err);
         return [];
@@ -153,7 +181,7 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
 export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWikiData[]> {
     if (typeof window === 'undefined') return [];
 
-    try {
+    const fetchQuestions = async (): Promise<WhenInWikiData[]> => {
         const supabase = getSupabaseClient();
         const limit = count * 3;
 
@@ -201,7 +229,10 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
         return shuffleArray(combined).slice(0, count);
+    };
 
+    try {
+        return await withTimeout(fetchQuestions(), QUERY_TIMEOUT_MS, []);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWhenInWikiFromDB:', err);
         return [];
@@ -217,7 +248,7 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
 export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiOrFictionData[]> {
     if (typeof window === 'undefined') return [];
 
-    try {
+    const fetchQuestions = async (): Promise<WikiOrFictionData[]> => {
         const supabase = getSupabaseClient();
         const limit = count * 3;
 
@@ -265,7 +296,10 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
         return shuffleArray(combined).slice(0, count);
+    };
 
+    try {
+        return await withTimeout(fetchQuestions(), QUERY_TIMEOUT_MS, []);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiOrFictionFromDB:', err);
         return [];
@@ -281,7 +315,7 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
 export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinksData[]> {
     if (typeof window === 'undefined') return [];
 
-    try {
+    const fetchQuestions = async (): Promise<WikiLinksData[]> => {
         const supabase = getSupabaseClient();
         const limit = count * 3;
 
@@ -329,7 +363,10 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
         return shuffleArray(combined).slice(0, count);
+    };
 
+    try {
+        return await withTimeout(fetchQuestions(), QUERY_TIMEOUT_MS, []);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiLinksFromDB:', err);
         return [];
@@ -346,7 +383,7 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
 export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
     if (typeof window === 'undefined') return [];
 
-    try {
+    const fetchQuestions = async (): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> => {
         const supabase = getSupabaseClient();
         const limit = count * 3;
 
@@ -402,6 +439,10 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
         return shuffleArray(combined).slice(0, count);
+    };
+
+    try {
+        return await withTimeout(fetchQuestions(), QUERY_TIMEOUT_MS, []);
     } catch (err) {
         console.error('[supabaseQuestions] Unexpected error in getRandomWikiWhatFromDB:', err);
         return [];
