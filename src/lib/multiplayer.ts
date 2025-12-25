@@ -3,6 +3,30 @@
 import { getSupabaseClient } from './supabase';
 import { getRandomTopics } from './wikipedia';
 
+/**
+ * Wrap a promise with a timeout to prevent silent hangs
+ */
+async function withTimeout<T>(promise: PromiseLike<T>, timeoutMs: number, errorMsg: string): Promise<T> {
+    let timeoutId: NodeJS.Timeout;
+    const timeoutPromise = new Promise<T>((_, reject) => {
+        timeoutId = setTimeout(() => {
+            console.warn(`[multiplayer] Query timed out after ${timeoutMs}ms`);
+            reject(new Error(errorMsg));
+        }, timeoutMs);
+    });
+
+    try {
+        const result = await Promise.race([promise, timeoutPromise]);
+        clearTimeout(timeoutId!);
+        return result;
+    } catch (err) {
+        clearTimeout(timeoutId!);
+        throw err;
+    }
+}
+
+const QUERY_TIMEOUT_MS = 15000; // 15 second timeout
+
 // Types
 export interface GameRoom {
     id: string;
@@ -74,40 +98,52 @@ export async function createRoom(hostId: string, hostUsername: string): Promise<
     let attempts = 0;
 
     while (attempts < 5) {
-        // Try to create room
-        const { data: room, error } = await supabase
-            .from('game_rooms')
-            .insert({ code, host_id: hostId })
-            .select()
-            .single();
+        try {
+            // Try to create room with timeout
+            const { data: room, error } = await withTimeout(
+                supabase
+                    .from('game_rooms')
+                    .insert({ code, host_id: hostId })
+                    .select()
+                    .single(),
+                QUERY_TIMEOUT_MS,
+                'Room creation timed out'
+            );
 
-        if (error) {
-            if (error.code === '23505') { // Unique constraint violation
-                code = generateRoomCode();
-                attempts++;
-                continue;
+            if (error) {
+                if (error.code === '23505') { // Unique constraint violation
+                    code = generateRoomCode();
+                    attempts++;
+                    continue;
+                }
+                return { room: null, error: error.message };
             }
-            return { room: null, error: error.message };
+
+            // Add host as player with timeout
+            const { error: playerError } = await withTimeout(
+                supabase
+                    .from('room_players')
+                    .insert({
+                        room_id: room.id,
+                        user_id: hostId,
+                        username: hostUsername,
+                        is_host: true,
+                        is_ready: true,
+                    }),
+                QUERY_TIMEOUT_MS,
+                'Adding host to room timed out'
+            );
+
+            if (playerError) {
+                // Cleanup room if player insert fails
+                await supabase.from('game_rooms').delete().eq('id', room.id);
+                return { room: null, error: playerError.message };
+            }
+
+            return { room: room as GameRoom, error: null };
+        } catch (err) {
+            return { room: null, error: err instanceof Error ? err.message : 'Room creation failed' };
         }
-
-        // Add host as player
-        const { error: playerError } = await supabase
-            .from('room_players')
-            .insert({
-                room_id: room.id,
-                user_id: hostId,
-                username: hostUsername,
-                is_host: true,
-                is_ready: true,
-            });
-
-        if (playerError) {
-            // Cleanup room if player insert fails
-            await supabase.from('game_rooms').delete().eq('id', room.id);
-            return { room: null, error: playerError.message };
-        }
-
-        return { room: room as GameRoom, error: null };
     }
 
     return { room: null, error: 'Could not generate unique room code' };
@@ -123,58 +159,78 @@ export async function joinRoom(
 ): Promise<{ room: GameRoom | null; error: string | null }> {
     const supabase = getSupabaseClient();
 
-    // Find room by code
-    const { data: room, error: findError } = await supabase
-        .from('game_rooms')
-        .select('*')
-        .eq('code', code.toUpperCase())
-        .single();
+    try {
+        // Find room by code with timeout
+        const { data: room, error: findError } = await withTimeout(
+            supabase
+                .from('game_rooms')
+                .select('*')
+                .eq('code', code.toUpperCase())
+                .single(),
+            QUERY_TIMEOUT_MS,
+            'Room lookup timed out'
+        );
 
-    if (findError || !room) {
-        return { room: null, error: 'Room not found' };
+        if (findError || !room) {
+            return { room: null, error: 'Room not found' };
+        }
+
+        if (room.status !== 'lobby') {
+            return { room: null, error: 'Game already in progress' };
+        }
+
+        // Check player count with timeout
+        const { count } = await withTimeout(
+            supabase
+                .from('room_players')
+                .select('*', { count: 'exact', head: true })
+                .eq('room_id', room.id),
+            QUERY_TIMEOUT_MS,
+            'Player count check timed out'
+        );
+
+        if (count && count >= room.max_players) {
+            return { room: null, error: 'Room is full' };
+        }
+
+        // Check if already in room with timeout
+        const { data: existing } = await withTimeout(
+            supabase
+                .from('room_players')
+                .select('id')
+                .eq('room_id', room.id)
+                .eq('user_id', userId)
+                .single(),
+            QUERY_TIMEOUT_MS,
+            'Existing player check timed out'
+        );
+
+        if (existing) {
+            return { room: room as GameRoom, error: null }; // Already joined
+        }
+
+        // Join room with timeout
+        const { error: joinError } = await withTimeout(
+            supabase
+                .from('room_players')
+                .insert({
+                    room_id: room.id,
+                    user_id: userId,
+                    username,
+                    is_host: false,
+                }),
+            QUERY_TIMEOUT_MS,
+            'Joining room timed out'
+        );
+
+        if (joinError) {
+            return { room: null, error: joinError.message };
+        }
+
+        return { room: room as GameRoom, error: null };
+    } catch (err) {
+        return { room: null, error: err instanceof Error ? err.message : 'Failed to join room' };
     }
-
-    if (room.status !== 'lobby') {
-        return { room: null, error: 'Game already in progress' };
-    }
-
-    // Check player count
-    const { count } = await supabase
-        .from('room_players')
-        .select('*', { count: 'exact', head: true })
-        .eq('room_id', room.id);
-
-    if (count && count >= room.max_players) {
-        return { room: null, error: 'Room is full' };
-    }
-
-    // Check if already in room
-    const { data: existing } = await supabase
-        .from('room_players')
-        .select('id')
-        .eq('room_id', room.id)
-        .eq('user_id', userId)
-        .single();
-
-    if (existing) {
-        return { room: room as GameRoom, error: null }; // Already joined
-    }
-
-    // Join room
-    const { error: joinError } = await supabase
-        .from('room_players')
-        .insert({
-            room_id: room.id,
-            user_id: userId,
-            username,
-            is_host: false,
-        });
-
-    if (joinError) {
-        return { room: null, error: joinError.message };
-    }
-
-    return { room: room as GameRoom, error: null };
 }
 
 /**
@@ -196,13 +252,22 @@ export async function leaveRoom(roomId: string, userId: string): Promise<void> {
 export async function getRoomByCode(code: string): Promise<GameRoom | null> {
     const supabase = getSupabaseClient();
 
-    const { data } = await supabase
-        .from('game_rooms')
-        .select('*')
-        .eq('code', code.toUpperCase())
-        .single();
+    try {
+        const { data } = await withTimeout(
+            supabase
+                .from('game_rooms')
+                .select('*')
+                .eq('code', code.toUpperCase())
+                .single(),
+            QUERY_TIMEOUT_MS,
+            'Room lookup timed out'
+        );
 
-    return data as GameRoom | null;
+        return data as GameRoom | null;
+    } catch (err) {
+        console.error('[multiplayer] getRoomByCode error:', err);
+        return null;
+    }
 }
 
 /**
@@ -211,13 +276,22 @@ export async function getRoomByCode(code: string): Promise<GameRoom | null> {
 export async function getRoomPlayers(roomId: string): Promise<RoomPlayer[]> {
     const supabase = getSupabaseClient();
 
-    const { data } = await supabase
-        .from('room_players')
-        .select('*')
-        .eq('room_id', roomId)
-        .order('score', { ascending: false });
+    try {
+        const { data } = await withTimeout(
+            supabase
+                .from('room_players')
+                .select('*')
+                .eq('room_id', roomId)
+                .order('score', { ascending: false }),
+            QUERY_TIMEOUT_MS,
+            'Getting room players timed out'
+        );
 
-    return (data || []) as RoomPlayer[];
+        return (data || []) as RoomPlayer[];
+    } catch (err) {
+        console.error('[multiplayer] getRoomPlayers error:', err);
+        return [];
+    }
 }
 
 /**
@@ -318,14 +392,23 @@ export async function startGame(roomId: string, hostId: string): Promise<{ succe
 export async function getCurrentQuestion(roomId: string, roundNumber: number): Promise<RoomQuestion | null> {
     const supabase = getSupabaseClient();
 
-    const { data } = await supabase
-        .from('room_questions')
-        .select('*')
-        .eq('room_id', roomId)
-        .eq('round_number', roundNumber)
-        .single();
+    try {
+        const { data } = await withTimeout(
+            supabase
+                .from('room_questions')
+                .select('*')
+                .eq('room_id', roomId)
+                .eq('round_number', roundNumber)
+                .single(),
+            QUERY_TIMEOUT_MS,
+            'Getting question timed out'
+        );
 
-    return data as RoomQuestion | null;
+        return data as RoomQuestion | null;
+    } catch (err) {
+        console.error('[multiplayer] getCurrentQuestion error:', err);
+        return null;
+    }
 }
 
 /**
@@ -365,16 +448,20 @@ export async function submitAnswer(
         }
     }
 
-    // Insert answer
-    await supabase.from('room_answers').insert({
-        room_id: roomId,
-        user_id: userId,
-        round_number: roundNumber,
-        answer,
-        is_correct: isCorrect,
-        time_ms: timeMs,
-        points_earned: points,
-    });
+    // Insert answer with timeout
+    await withTimeout(
+        supabase.from('room_answers').insert({
+            room_id: roomId,
+            user_id: userId,
+            round_number: roundNumber,
+            answer,
+            is_correct: isCorrect,
+            time_ms: timeMs,
+            points_earned: points,
+        }),
+        QUERY_TIMEOUT_MS,
+        'Submitting answer timed out'
+    );
 
     // Update player score directly
     const { data: playerData } = await supabase
