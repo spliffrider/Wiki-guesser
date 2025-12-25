@@ -170,3 +170,76 @@
     font-size: var(--text-xs);
     font-weight: var(--font-weight-bold);
 }
+
+/* Wikipedia URL Step */
+.urlStep {
+    text-align: center;
+}
+
+.urlActions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.fetchButton {
+    padding: var(--space-4) var(--space-8);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.fetchButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.fetchButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.skipButton {
+    padding: var(--space-3) var(--space-6);
+    background: none;
+    border: 1px solid var(--color-border-light);
+    color: var(--color-text-muted);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.skipButton:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+.autoFilledNotice {
+    background-color: var(--color-success-light, rgba(16, 185, 129, 0.1));
+    color: var(--color-success, #10b981);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.imagePreview {
+    margin-top: var(--space-3);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    max-width: 200px;
+}
+
+.imagePreview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}

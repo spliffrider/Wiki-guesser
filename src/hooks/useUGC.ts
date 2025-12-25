@@ -106,6 +106,19 @@ export function useUGC() {
 
             if (error) throw error;
 
+            // Check for creator achievements
+            // Get updated question count
+            const { count } = await supabase
+                .from('user_submitted_questions')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id);
+
+            if (count) {
+                // Import dynamically to avoid circular dependency
+                const { checkCreatorAchievements } = await import('@/lib/achievements');
+                await checkCreatorAchievements(user.id, count);
+            }
+
             return { data, error: null };
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : 'An unknown error occurred';

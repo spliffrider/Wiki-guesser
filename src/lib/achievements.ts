@@ -28,6 +28,11 @@ export const ACHIEVEMENTS: Achievement[] = [
     { id: 'level_20', name: 'Scholar', description: 'Reach Level 20', icon: '🎓' },
     { id: 'level_30', name: 'Master', description: 'Reach Level 30', icon: '🧙' },
     { id: 'level_50', name: 'Legend', description: 'Reach Level 50', icon: '👑' },
+    // Creator achievements
+    { id: 'creator_1', name: 'First Creation', description: 'Submit your first question', icon: '✍️' },
+    { id: 'creator_10', name: 'Prolific Creator', description: 'Submit 10 questions', icon: '📝' },
+    { id: 'creator_50', name: 'Question Master', description: 'Submit 50 questions', icon: '🎨' },
+    { id: 'creator_100', name: 'Question Legend', description: 'Submit 100 questions', icon: '👑' },
 ];
 
 export interface UnlockedAchievement {
@@ -139,4 +144,37 @@ export async function checkAndUnlockAchievements(
  */
 export function getAchievementById(id: string): Achievement | undefined {
     return ACHIEVEMENTS.find(a => a.id === id);
+}
+
+/**
+ * Check and unlock creator achievements after submitting a question
+ * Returns array of newly unlocked achievement IDs
+ */
+export async function checkCreatorAchievements(
+    userId: string,
+    questionsSubmitted: number
+): Promise<string[]> {
+    const newlyUnlocked: string[] = [];
+
+    // Get already unlocked achievements
+    const existing = await getUserAchievements(userId);
+    const unlockedIds = new Set(existing.map(a => a.achievement_id));
+
+    const checks: { id: string; threshold: number }[] = [
+        { id: 'creator_1', threshold: 1 },
+        { id: 'creator_10', threshold: 10 },
+        { id: 'creator_50', threshold: 50 },
+        { id: 'creator_100', threshold: 100 },
+    ];
+
+    for (const check of checks) {
+        if (questionsSubmitted >= check.threshold && !unlockedIds.has(check.id)) {
+            const success = await unlockAchievement(userId, check.id);
+            if (success) {
+                newlyUnlocked.push(check.id);
+            }
+        }
+    }
+
+    return newlyUnlocked;
 }
