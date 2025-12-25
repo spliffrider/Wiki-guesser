@@ -24,8 +24,9 @@ export function RewardStar() {
     if (!profile) return null;
 
     return (
-        <Link href="/submit" className={styles.rewardStar} title="Reward Points (UGC)">
+        <Link href="/submit" className={styles.rewardStar} title="Submit your own questions and earn rewards!">
             <span className={`${styles.star} ${animate ? styles.bump : ''}`}>⭐</span>
+            <span className={styles.label}>Creator Hub</span>
             <span className={styles.points}>{points.toLocaleString()}</span>
         </Link>
     );

@@ -73,6 +73,16 @@ export default function HomePage() {
             <li>Build streaks for bonus multipliers 🔥</li>
           </ol>
         </div>
+
+        <div className={styles.creatorHub}>
+          <h3 className={styles.creatorHubTitle}>⭐ Creator Hub</h3>
+          <p className={styles.creatorHubDescription}>
+            Got a great quiz question idea? Submit your own questions and earn reward points when players answer them!
+          </p>
+          <a href="/submit" className={styles.creatorHubLink}>
+            Open Creator Hub →
+          </a>
+        </div>
       </main>
 
       <footer className={styles.footer}>
