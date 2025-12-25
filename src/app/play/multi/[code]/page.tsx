@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayerGame } from '@/hooks/useMultiplayerGame';
 import { Header } from '@/components/layout/Header';
 import { redactExcerpt } from '@/lib/wikipedia';
+import { getAvatarEmoji } from '@/lib/avatars';
 import styles from './page.module.css';
 
 export default function MultiplayerRoomPage() {
@@ -57,6 +58,11 @@ export default function MultiplayerRoomPage() {
         }
     };
 
+    const handleCopyCode = () => {
+        navigator.clipboard.writeText(code);
+        // Visual feedback is handled by CSS active state or could add a toast here
+    };
+
     const allReady = players.length >= 2 && players.every(p => p.is_ready);
 
     if (authLoading || !user) {
@@ -90,7 +96,13 @@ export default function MultiplayerRoomPage() {
                 <Header />
                 <main className={styles.main}>
                     <div className={styles.roomHeader}>
-                        <h1>Room: <span className={styles.roomCode}>{code}</span></h1>
+                        <h1>Room:</h1>
+                        <div className={styles.roomCodeWrapper}>
+                            <span className={styles.roomCode}>{code}</span>
+                            <button onClick={handleCopyCode} className={styles.copyBtn} title="Copy Code">
+                                📋
+                            </button>
+                        </div>
                         <p>Share this code with friends to join!</p>
                     </div>
 
@@ -99,6 +111,9 @@ export default function MultiplayerRoomPage() {
                         {players.map(player => (
                             <div key={player.id} className={styles.playerCard}>
                                 <span className={styles.playerName}>
+                                    <span style={{ marginRight: '8px', fontSize: '1.2em' }}>
+                                        {getAvatarEmoji(players.find(p => p.id === player.id)?.user_id === user.id ? (profile?.avatar_url ?? null) : null) || '👤'}
+                                    </span>
                                     {player.is_host && '👑 '}
                                     {player.username}
                                     {player.user_id === user.id && ' (You)'}
@@ -147,8 +162,10 @@ export default function MultiplayerRoomPage() {
                 <Header />
                 <main className={styles.countdown}>
                     <h1>Round {room?.current_round}</h1>
-                    <div className={styles.countdownNumber}>3</div>
-                    <p>Get ready...</p>
+                    <div key={timeRemaining} className={styles.countdownNumber}>
+                        {Math.ceil(timeRemaining / 1000) || 3}
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', marginTop: '1rem' }}>Get ready...</p>
                 </main>
             </div>
         );
