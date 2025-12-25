@@ -5,13 +5,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUGC } from '@/hooks/useUGC';
-import { PendingQuestionView } from '@/types/ugc';
+import { AllPendingQuestionView } from '@/types/ugc';
 import styles from './page.module.css';
 
 export default function AdminPage() {
     const { user, profile, isLoading: authLoading } = useAuth();
-    const { getQuestionsForModeration, reviewQuestion, isLoading: ugcLoading } = useUGC();
-    const [questions, setQuestions] = useState<PendingQuestionView[]>([]);
+    const { getQuestionsForModeration, reviewQuestion, reviewAnonymousQuestion, isLoading: ugcLoading } = useUGC();
+    const [questions, setQuestions] = useState<AllPendingQuestionView[]>([]);
     const [reviewingId, setReviewingId] = useState<string | null>(null);
     const router = useRouter();
 
@@ -27,9 +27,13 @@ export default function AdminPage() {
         }
     }, [profile, getQuestionsForModeration]);
 
-    const handleReview = async (questionId: string, action: 'approve' | 'reject', notes?: string) => {
+    const handleReview = async (questionId: string, source: 'authenticated' | 'anonymous', action: 'approve' | 'reject', notes?: string) => {
         setReviewingId(questionId);
-        const result = await reviewQuestion({ questionId, action, notes });
+
+        // Route to appropriate review function based on source
+        const result = source === 'anonymous'
+            ? await reviewAnonymousQuestion(questionId, action)
+            : await reviewQuestion({ questionId, action, notes });
 
         if (result.error) {
             alert(`Error: ${result.error}`);
@@ -70,8 +74,16 @@ export default function AdminPage() {
                     questions.map((q) => (
                         <div key={q.id} className={styles.adminCard}>
                             <div className={styles.cardHeader}>
-                                <span className={styles.badge}>{q.category}</span>
-                                <span className={styles.meta}>by {q.submitter_username} at {new Date(q.submitted_at).toLocaleString()}</span>
+                                <div className={styles.categoryBadge}>
+                                    <span className={styles.badge}>{q.category}</span>
+                                    <span
+                                        className={`${styles.sourceBadge} ${q.source === 'anonymous' ? styles.anonymous : styles.authenticated}`}
+                                        title={q.source === 'anonymous' ? 'Anonymous submission' : 'Authenticated user submission'}
+                                    >
+                                        {q.source === 'anonymous' ? '🔰 Anonymous' : '👤 ' + q.submitter_username}
+                                    </span>
+                                </div>
+                                <span className={styles.meta}>Submitted {new Date(q.submitted_at).toLocaleString()}</span>
                             </div>
 
                             <div className={styles.cardContent}>
@@ -82,18 +94,18 @@ export default function AdminPage() {
 
                             <div className={styles.actions}>
                                 <button
-                                    onClick={() => handleReview(q.id, 'approve')}
+                                    onClick={() => handleReview(q.id, q.source, 'approve')}
                                     disabled={reviewingId === q.id}
                                     className={`${styles.btn} ${styles.approve}`}
                                 >
-                                    Approve
+                                    {q.source === 'anonymous' ? '✓ Approve & Curate' : '✓ Approve'}
                                 </button>
                                 <button
-                                    onClick={() => handleReview(q.id, 'reject')}
+                                    onClick={() => handleReview(q.id, q.source, 'reject')}
                                     disabled={reviewingId === q.id}
                                     className={`${styles.btn} ${styles.reject}`}
                                 >
-                                    Reject
+                                    ✗ Reject
                                 </button>
                             </div>
                         </div>

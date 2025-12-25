@@ -2,10 +2,12 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Difficulty } from '@/types';
 import { Header } from '@/components/layout/Header';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUGC } from '@/hooks/useUGC';
 import styles from './page.module.css';
 
 const difficulties: { value: Difficulty; label: string; description: string }[] = [
@@ -17,11 +19,47 @@ const difficulties: { value: Difficulty; label: string; description: string }[] 
 
 export default function HomePage() {
   const router = useRouter();
+  const { user, profile } = useAuth();
+  const { spendTokensForCurated, getCuratedGameCost } = useUGC();
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('easy');
+  const [curatedCost, setCuratedCost] = useState(5);
+  const [isSpending, setIsSpending] = useState(false);
+
+  // Fetch curated game cost on mount
+  useEffect(() => {
+    getCuratedGameCost().then(cost => setCuratedCost(cost));
+  }, [getCuratedGameCost]);
 
   const handlePlay = () => {
     router.push(`/play/single?difficulty=${selectedDifficulty}`);
   };
+
+  const handleCuratedPlay = async () => {
+    if (!user) {
+      router.push('/auth/login?redirect=/');
+      return;
+    }
+
+    if ((profile?.reward_points || 0) < curatedCost) {
+      // Not enough tokens - redirect to creator hub to earn more
+      router.push('/submit');
+      return;
+    }
+
+    setIsSpending(true);
+    const result = await spendTokensForCurated();
+    setIsSpending(false);
+
+    if (result.success) {
+      router.push(`/play/single?difficulty=${selectedDifficulty}&mode=curated`);
+    } else {
+      // Could show a toast here, but for now just log
+      console.error('Failed to spend tokens:', result.error);
+    }
+  };
+
+  const userBalance = profile?.reward_points || 0;
+  const canAffordCurated = userBalance >= curatedCost;
 
   return (
     <div className={styles.container}>
@@ -62,6 +100,34 @@ export default function HomePage() {
               👥 Multiplayer
             </button>
           </div>
+
+          <div className={styles.curatedSection}>
+            <button
+              onClick={handleCuratedPlay}
+              className={`${styles.curatedButton} ${!canAffordCurated && user ? styles.disabled : ''}`}
+              disabled={isSpending}
+            >
+              {isSpending ? (
+                'Loading...'
+              ) : (
+                <>
+                  ⭐ Curated Mode
+                  <span className={styles.tokenCost}>
+                    🪙 {curatedCost}
+                  </span>
+                </>
+              )}
+            </button>
+            <p className={styles.curatedHint}>
+              {!user ? (
+                'Log in to play curated community questions'
+              ) : !canAffordCurated ? (
+                <>You need {curatedCost - userBalance} more tokens. <a href="/submit">Earn tokens →</a></>
+              ) : (
+                'Play hand-picked questions from our community'
+              )}
+            </p>
+          </div>
         </div>
 
         <div className={styles.howToPlay}>
@@ -91,3 +157,4 @@ export default function HomePage() {
     </div>
   );
 }
+

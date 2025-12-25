@@ -13,6 +13,7 @@ import {
     VoteType,
     QuestionStatus,
     PendingQuestionView,
+    AllPendingQuestionView,
     CurationCandidateView
 } from '@/types/ugc';
 
@@ -130,6 +131,34 @@ export function useUGC() {
         }
     };
 
+    // Submit an anonymous question (no auth required)
+    const submitAnonymousQuestion = async (request: SubmitQuestionRequest) => {
+        try {
+            setIsLoading(true);
+            setError(null);
+
+            const { data, error } = await supabase
+                .from('anonymous_submitted_questions')
+                .insert({
+                    category: request.category,
+                    question_data: request.questionData,
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            return { data, error: null };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
+            console.error('[useUGC] Error submitting anonymous question:', err);
+            setError(message);
+            return { error: message };
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // Fetch questions for voting (approved candidates)
     const getQuestionsForVoting = useCallback(async (): Promise<CurationCandidateView[]> => {
         try {
@@ -151,13 +180,13 @@ export function useUGC() {
         }
     }, [supabase]);
 
-    // Fetch questions for moderation (admin only)
-    const getQuestionsForModeration = useCallback(async (): Promise<PendingQuestionView[]> => {
+    // Fetch questions for moderation (admin only) - includes both authenticated and anonymous
+    const getQuestionsForModeration = useCallback(async (): Promise<AllPendingQuestionView[]> => {
         if (!user) return [];
         try {
             setIsLoading(true);
             const { data, error } = await supabase
-                .from('pending_questions_view')
+                .from('all_pending_questions_view')
                 .select('*')
                 .order('submitted_at', { ascending: true });
 
@@ -236,14 +265,102 @@ export function useUGC() {
         }
     };
 
+    // Admin: Review an anonymous question
+    const reviewAnonymousQuestion = async (questionId: string, action: 'approve' | 'reject') => {
+        if (!user) return { error: 'Not authenticated' };
+        try {
+            setIsLoading(true);
+
+            let error;
+            if (action === 'approve') {
+                const { error: rpcError } = await supabase.rpc('approve_anonymous_question', {
+                    p_question_id: questionId,
+                    p_admin_id: user.id,
+                    p_notes: null
+                });
+                error = rpcError;
+            } else {
+                const { error: rpcError } = await supabase.rpc('reject_anonymous_question', {
+                    p_question_id: questionId,
+                    p_admin_id: user.id,
+                    p_notes: null
+                });
+                error = rpcError;
+            }
+
+            if (error) throw error;
+            return { error: null };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
+            console.error('[useUGC] Error reviewing anonymous question:', err);
+            return { error: message };
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Spend tokens to play curated mode
+    const spendTokensForCurated = async () => {
+        if (!user) return { success: false, error: 'Not authenticated' };
+        try {
+            const { data, error } = await supabase.rpc('spend_tokens', {
+                p_user_id: user.id,
+                p_amount: 5, // Use app_config value ideally, but 5 is the default
+                p_reason: 'Play curated questions mode'
+            });
+
+            if (error) throw error;
+
+            // Refresh user profile to update displayed balance
+            // The AuthContext should handle this, but we return the result
+            return { success: data === true, error: data ? null : 'Insufficient tokens' };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'An unknown error occurred';
+            console.error('[useUGC] Error spending tokens:', err);
+            return { success: false, error: message };
+        }
+    };
+
+    // Get the cost of curated game
+    const getCuratedGameCost = async (): Promise<number> => {
+        try {
+            const { data, error } = await supabase.rpc('get_curated_game_cost');
+            if (error) throw error;
+            return data || 5;
+        } catch (err) {
+            console.error('[useUGC] Error getting curated game cost:', err);
+            return 5; // Default fallback
+        }
+    };
+
+    // Check if user can afford curated game
+    const canAffordCuratedGame = async (): Promise<boolean> => {
+        if (!user) return false;
+        try {
+            const { data, error } = await supabase.rpc('can_afford_curated_game', {
+                p_user_id: user.id
+            });
+            if (error) throw error;
+            return data === true;
+        } catch (err) {
+            console.error('[useUGC] Error checking affordability:', err);
+            return false;
+        }
+    };
+
     return {
         isLoading,
         error,
         fetchUserSummary,
         submitQuestion,
+        submitAnonymousQuestion,
         getQuestionsForVoting,
         getQuestionsForModeration,
         voteOnQuestion,
-        reviewQuestion
+        reviewQuestion,
+        reviewAnonymousQuestion,
+        spendTokensForCurated,
+        getCuratedGameCost,
+        canAffordCuratedGame
     };
 }

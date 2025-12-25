@@ -17,7 +17,9 @@ export type RewardType =
     | 'question_approved'
     | 'question_curated'
     | 'vote_bonus'
-    | 'achievement';
+    | 'achievement'
+    | 'upvote_received'
+    | 'curated_game_spent';
 
 // -----------------------------------------------------------------------------
 // Database Row Types
@@ -25,7 +27,7 @@ export type RewardType =
 
 export interface UserSubmittedQuestion {
     id: string;
-    user_id: string;
+    user_id: string | null; // NULL for anonymous curated questions
     category: QuestionCategory;
     question_data: QuestionData;
     status: QuestionStatus;
@@ -37,6 +39,16 @@ export interface UserSubmittedQuestion {
     downvotes: number;
     created_at: string;
     updated_at: string;
+}
+
+export interface AnonymousSubmittedQuestion {
+    id: string;
+    category: QuestionCategory;
+    question_data: QuestionData;
+    submitted_at: string;
+    submitter_ip: string | null;
+    spam_score: number;
+    created_at: string;
 }
 
 export interface QuestionVote {
@@ -128,6 +140,17 @@ export interface PendingQuestionView {
     submitter_id: string;
 }
 
+export interface AllPendingQuestionView {
+    id: string;
+    category: QuestionCategory;
+    question_data: QuestionData;
+    submitted_at: string;
+    source: 'authenticated' | 'anonymous';
+    submitter_username: string; // 'Anonymous' for anonymous
+    submitter_id: string | null; // NULL for anonymous
+    spam_score: number;
+}
+
 export interface CurationCandidateView {
     id: string;
     category: QuestionCategory;
@@ -181,7 +204,9 @@ export type AppConfigKey =
     | 'curation_threshold'
     | 'points_for_approved'
     | 'points_for_curated'
-    | 'points_for_voting';
+    | 'points_for_voting'
+    | 'points_per_upvote'
+    | 'curated_game_cost';
 
 // -----------------------------------------------------------------------------
 // Helper function types

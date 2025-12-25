@@ -24,6 +24,11 @@ interface QuestionFormProps {
     initialData: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     validate: (data: any) => boolean;
+    // Optional: Override submission logic (for anonymous submissions)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSubmitOverride?: (data: any) => Promise<void>;
+    // Optional: Flag for anonymous submissions (hides success redirect)
+    isAnonymous?: boolean;
 }
 
 export function QuestionForm({
@@ -32,7 +37,9 @@ export function QuestionForm({
     icon,
     children,
     initialData,
-    validate
+    validate,
+    onSubmitOverride,
+    isAnonymous = false
 }: QuestionFormProps) {
     const router = useRouter();
     const { submitQuestion, isLoading, error: submitError } = useUGC();
@@ -57,6 +64,13 @@ export function QuestionForm({
             return;
         }
 
+        if (onSubmitOverride) {
+            // Use custom submission logic (for anonymous)
+            await onSubmitOverride(formData);
+            return;
+        }
+
+        // Default authenticated submission
         const result = await submitQuestion({
             category,
             questionData: formData as QuestionData
@@ -66,10 +80,12 @@ export function QuestionForm({
             setError(result.error);
         } else {
             setIsSuccess(true);
-            // Wait a bit then redirect
-            setTimeout(() => {
-                router.push('/submit');
-            }, 2000);
+            // Wait a bit then redirect (skip for anonymous)
+            if (!isAnonymous) {
+                setTimeout(() => {
+                    router.push('/submit');
+                }, 2000);
+            }
         }
     };
 
@@ -87,9 +103,11 @@ export function QuestionForm({
 
     return (
         <div className={styles.formContainer}>
-            <Link href="/submit" className={styles.backLink}>
-                ← Back to Creator Hub
-            </Link>
+            {!isAnonymous && (
+                <Link href="/submit" className={styles.backLink}>
+                    ← Back to Creator Hub
+                </Link>
+            )}
 
             <h1 className={styles.title}>
                 <span>{icon}</span> Submit {title}
