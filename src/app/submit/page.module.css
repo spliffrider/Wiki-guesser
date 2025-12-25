@@ -188,3 +188,126 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Step-based URL input flow */
+.urlSection {
+    background-color: var(--color-bg-primary);
+    border-radius: var(--border-radius-xl);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border-subtle);
+    text-align: center;
+}
+
+.urlDescription {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+    font-size: var(--text-lg);
+}
+
+.urlInputGroup {
+    display: flex;
+    gap: var(--space-3);
+    max-width: 600px;
+    margin: 0 auto var(--space-6);
+}
+
+.urlInput {
+    flex: 1;
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    border: 2px solid var(--color-border-light);
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    transition: border-color var(--transition-fast);
+}
+
+.urlInput:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.fetchButton {
+    padding: var(--space-4) var(--space-6);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+}
+
+.fetchButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.fetchButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.skipButton {
+    background: none;
+    border: 1px solid var(--color-border-light);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--border-radius-lg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.skipButton:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+.errorText {
+    color: var(--color-error);
+    margin-bottom: var(--space-4);
+}
+
+.stepHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.backButton {
+    background: none;
+    border: 1px solid var(--color-border-light);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.backButton:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+.wikiPreview {
+    background-color: var(--color-primary-light);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    color: var(--color-text-primary);
+}
+
+.wikiPreviewLabel {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-right: var(--space-2);
+}
+
+@media (max-width: 500px) {
+    .urlInputGroup {
+        flex-direction: column;
+    }
+}

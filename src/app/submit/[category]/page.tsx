@@ -2,6 +2,7 @@
 'use client';
 
 import { use } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { QuestionCategory } from '@/types';
 import { QuestionForm } from '@/components/submit/QuestionForm';
 import { WikiWhatFields } from '@/components/submit/fields/WikiWhatFields';
@@ -24,11 +25,21 @@ const CATEGORY_MAP: Record<string, { title: string; icon: string }> = {
 
 export default function CategorySubmitPage({ params }: PageProps) {
     const { category } = use(params);
+    const searchParams = useSearchParams();
     const catInfo = CATEGORY_MAP[category];
 
     if (!catInfo) {
         return <div>Category not found</div>;
     }
+
+    // Read pre-filled data from URL params (from Wikipedia fetch)
+    const prefillData = {
+        topic: searchParams.get('topic') || '',
+        title: searchParams.get('title') || '',
+        excerpt: searchParams.get('excerpt') || '',
+        imageUrl: searchParams.get('imageUrl') || '',
+        source: searchParams.get('source') || ''
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const renderFields = (props: any) => {
@@ -44,11 +55,43 @@ export default function CategorySubmitPage({ params }: PageProps) {
 
     const getInitialData = () => {
         switch (category) {
-            case 'wiki_what': return { title: '', excerpt: '', imageUrl: '', wrongOptions: ['', '', ''], topic: '' };
-            case 'wiki_or_fiction': return { statement: '', isTrue: true, explanation: '', topic: '', source: '' };
-            case 'odd_wiki_out': return { items: ['', '', '', ''], impostorIndex: 0, connection: '', topic: '' };
-            case 'when_in_wiki': return { event: '', correctYear: new Date().getFullYear(), yearOptions: [0, 0, 0, 0], topic: '' };
-            case 'wiki_links': return { titles: ['', '', '', ''], connection: '', connectionOptions: ['', '', '', ''], topic: '' };
+            case 'wiki_what':
+                return {
+                    title: prefillData.title,
+                    excerpt: prefillData.excerpt,
+                    imageUrl: prefillData.imageUrl,
+                    wrongOptions: ['', '', ''],
+                    topic: prefillData.topic
+                };
+            case 'wiki_or_fiction':
+                return {
+                    statement: '',
+                    isTrue: true,
+                    explanation: '',
+                    topic: prefillData.topic,
+                    source: prefillData.source
+                };
+            case 'odd_wiki_out':
+                return {
+                    items: ['', '', '', ''],
+                    impostorIndex: 0,
+                    connection: '',
+                    topic: prefillData.topic
+                };
+            case 'when_in_wiki':
+                return {
+                    event: '',
+                    correctYear: new Date().getFullYear(),
+                    yearOptions: [0, 0, 0, 0],
+                    topic: prefillData.topic
+                };
+            case 'wiki_links':
+                return {
+                    titles: ['', '', '', ''],
+                    connection: '',
+                    connectionOptions: ['', '', '', ''],
+                    topic: prefillData.topic
+                };
             default: return {};
         }
     };
@@ -87,3 +130,4 @@ export default function CategorySubmitPage({ params }: PageProps) {
         </div>
     );
 }
+
