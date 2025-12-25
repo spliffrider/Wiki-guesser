@@ -149,6 +149,16 @@ export default function HomePage() {
             Open Creator Hub →
           </a>
         </div>
+
+        <div className={styles.anonymousContribute}>
+          <h3 className={styles.anonymousTitle}>📝 Contribute Anonymously</h3>
+          <p className={styles.anonymousDescription}>
+            Want to help without an account? Submit questions anonymously - no login required!
+          </p>
+          <a href="/submit-anonymous" className={styles.anonymousLink}>
+            Submit a Question →
+          </a>
+        </div>
       </main>
 
       <footer className={styles.footer}>
