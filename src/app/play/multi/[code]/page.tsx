@@ -59,7 +59,9 @@ export default function MultiplayerRoomPage() {
     };
 
     const handleCopyCode = () => {
-        navigator.clipboard.writeText(code);
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://wiki-guesser.vercel.app';
+        const shareUrl = `${baseUrl}/play/multi/${code}`;
+        navigator.clipboard.writeText(shareUrl);
         // Visual feedback is handled by CSS active state or could add a toast here
     };
 
@@ -99,7 +101,7 @@ export default function MultiplayerRoomPage() {
                         <h1>Room:</h1>
                         <div className={styles.roomCodeWrapper}>
                             <span className={styles.roomCode}>{code}</span>
-                            <button onClick={handleCopyCode} className={styles.copyBtn} title="Copy Code">
+                            <button onClick={handleCopyCode} className={styles.copyBtn} title="Copy invite link">
                                 📋
                             </button>
                         </div>
