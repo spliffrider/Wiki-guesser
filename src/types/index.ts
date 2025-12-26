@@ -14,6 +14,7 @@ export type QuestionCategory =
 
 // Category-specific data structures
 export interface OddWikiOutData {
+    id: string;             // Database ID for rating system
     items: string[];        // 4 items: 3 belong together, 1 is the impostor
     impostorIndex: number;  // Index of the item that doesn't belong
     connection: string;     // What connects the 3 correct items
@@ -22,6 +23,7 @@ export interface OddWikiOutData {
 }
 
 export interface WhenInWikiData {
+    id: string;             // Database ID for rating system
     event: string;          // Description of the historical event
     correctYear: number;    // The actual year
     yearOptions: number[];  // 4 year choices (shuffled, includes correct)
@@ -30,6 +32,7 @@ export interface WhenInWikiData {
 }
 
 export interface WikiOrFictionData {
+    id: string;             // Database ID for rating system
     statement: string;      // The claim to evaluate
     isTrue: boolean;        // Whether the statement is true
     explanation: string;    // Explanation shown after answering
@@ -38,6 +41,7 @@ export interface WikiOrFictionData {
 }
 
 export interface WikiLinksData {
+    id: string;                 // Database ID for rating system
     titles: string[];           // 4 Wikipedia article titles
     connection: string;         // What connects them
     topic: string;              // Category/Topic of the question
@@ -63,6 +67,7 @@ export interface WikiTopic {
 export interface Round {
     roundNumber: number;
     category: QuestionCategory;
+    questionId: string;         // Format: "{category}_{db_id}" for rating system
     topic: WikiTopic;           // Used for wiki_what, can be partial for other categories
     options: string[];          // Multiple choice options (2 for wiki_or_fiction, 4 for others)
     correctAnswer: string;      // The correct answer for this round
@@ -149,3 +154,25 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, {
         excerptLength: 100,
     },
 };
+
+// ---------------------------------------------------------
+// Question Rating System Types
+// ---------------------------------------------------------
+
+export interface QuestionRating {
+    question_id: string;      // Format: "{category}_{db_id}" e.g. "wiki_what_abc-123"
+    category: QuestionCategory;
+    rating_value: number;     // 0-100
+}
+
+export interface RatingSubmission {
+    ratings: QuestionRating[];
+}
+
+export interface PlayedQuestion {
+    id: string;               // question_id for ratings
+    category: QuestionCategory;
+    title: string;            // Display title for rating UI
+    roundNumber: number;      // Which round this was
+}
+

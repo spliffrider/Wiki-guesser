@@ -120,6 +120,7 @@ function SinglePlayerGame() {
                     category={state.rounds[state.currentRound]?.category}
                     categoryData={state.rounds[state.currentRound]?.categoryData}
                     correctAnswer={state.rounds[state.currentRound]?.correctAnswer}
+                    rounds={state.rounds}
                 />
             </main>
         </div>

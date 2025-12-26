@@ -130,6 +130,7 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
 
         // 3. Map and Combine
         const mainMapped = (mainData as OddWikiOutRow[] || []).map((row: OddWikiOutRow) => ({
+            id: `odd_wiki_out_${row.id}`,  // Format for rating system
             items: row.items,
             impostorIndex: row.impostor_index,
             connection: row.connection,
@@ -143,6 +144,7 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
             // In UGC schema, keys are camelCase: items, impostorIndex, connection, topic
             const q = row.question_data as OddWikiOutQuestionData;
             return {
+                id: `user_submitted_${row.id}`,  // Format for rating system
                 items: q.items,
                 impostorIndex: q.impostorIndex,
                 connection: q.connection,
@@ -186,6 +188,7 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
 
         // 3. Map and Combine
         const mainMapped = (mainData as WhenInWikiRow[] || []).map((row: WhenInWikiRow) => ({
+            id: `when_in_wiki_${row.id}`,  // Format for rating system
             event: row.event,
             correctYear: row.correct_year,
             yearOptions: row.year_options,
@@ -197,6 +200,7 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
             const row = _row as UserSubmittedQuestion;
             const q = row.question_data as WhenInWikiQuestionData;
             return {
+                id: `user_submitted_${row.id}`,  // Format for rating system
                 event: q.event,
                 correctYear: q.correctYear,
                 yearOptions: q.yearOptions,
@@ -239,6 +243,7 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
 
         // 3. Map and Combine
         const mainMapped = (mainData as WikiOrFictionRow[] || []).map((row: WikiOrFictionRow) => ({
+            id: `wiki_or_fiction_${row.id}`,  // Format for rating system
             statement: row.statement,
             isTrue: row.is_true,
             explanation: row.explanation,
@@ -250,6 +255,7 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
             const row = _row as UserSubmittedQuestion;
             const q = row.question_data as WikiOrFictionQuestionData;
             return {
+                id: `user_submitted_${row.id}`,  // Format for rating system
                 statement: q.statement,
                 isTrue: q.isTrue,
                 explanation: q.explanation,
@@ -292,6 +298,7 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
 
         // 3. Map and Combine
         const mainMapped = (mainData as WikiLinksRow[] || []).map((row: WikiLinksRow) => ({
+            id: `wiki_links_${row.id}`,  // Format for rating system
             titles: row.titles,
             connection: row.connection,
             connectionOptions: row.connection_options,
@@ -303,6 +310,7 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
             const row = _row as UserSubmittedQuestion;
             const q = row.question_data as WikiLinksQuestionData;
             return {
+                id: `user_submitted_${row.id}`,  // Format for rating system
                 titles: q.titles,
                 connection: q.connection,
                 connectionOptions: q.connectionOptions,

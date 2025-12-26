@@ -7,12 +7,40 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getSupabaseClient } from '@/lib/supabase';
 import styles from './RewardStar.module.css';
 
+const DAILY_TOKEN_LIMIT = 2;
+const STORAGE_KEY = 'debug_token_usage';
+
+function getTokenUsageToday(): number {
+    if (typeof window === 'undefined') return 0;
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return 0;
+        const { date, count } = JSON.parse(stored);
+        const today = new Date().toDateString();
+        return date === today ? count : 0;
+    } catch {
+        return 0;
+    }
+}
+
+function incrementTokenUsage(): void {
+    if (typeof window === 'undefined') return;
+    const today = new Date().toDateString();
+    const current = getTokenUsageToday();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, count: current + 1 }));
+}
+
 export function RewardStar() {
     const { profile, user } = useAuth();
     const [points, setPoints] = useState(profile?.reward_points || 0);
     const [animate, setAnimate] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
+    const [usesToday, setUsesToday] = useState(0);
     const supabase = getSupabaseClient();
+
+    useEffect(() => {
+        setUsesToday(getTokenUsageToday());
+    }, []);
 
     useEffect(() => {
         if (profile?.reward_points !== undefined && profile.reward_points !== points) {
@@ -28,7 +56,7 @@ export function RewardStar() {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!user || isAdding) return;
+        if (!user || isAdding || usesToday >= DAILY_TOKEN_LIMIT) return;
 
         setIsAdding(true);
         try {
@@ -42,7 +70,7 @@ export function RewardStar() {
             if (error) {
                 console.error('Error adding tokens:', error);
             } else {
-                // Force refresh the profile to update the UI
+                incrementTokenUsage();
                 window.location.reload();
             }
         } catch (err) {
@@ -54,6 +82,9 @@ export function RewardStar() {
 
     if (!profile) return null;
 
+    const remaining = DAILY_TOKEN_LIMIT - usesToday;
+    const isExhausted = remaining <= 0;
+
     return (
         <div className={styles.container}>
             <Link href="/submit" className={styles.rewardStar} title="Submit your own questions and earn rewards!">
@@ -63,12 +94,13 @@ export function RewardStar() {
             </Link>
             <button
                 onClick={handleAddTokens}
-                className={styles.debugButton}
-                disabled={isAdding}
-                title="Add 1000 tokens (testing)"
+                className={`${styles.debugButton} ${isExhausted ? styles.exhausted : ''}`}
+                disabled={isAdding || isExhausted}
+                title={isExhausted ? 'Daily limit reached (2/day)' : `Add 1000 tokens (${remaining} left today)`}
             >
-                {isAdding ? '...' : '+1k'}
+                {isAdding ? '...' : isExhausted ? '0' : `+1k`}
             </button>
         </div>
     );
 }
+

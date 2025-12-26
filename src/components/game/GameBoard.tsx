@@ -3,14 +3,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { WikiTopic, Difficulty, DIFFICULTY_CONFIG, QuestionCategory, CategoryData } from '@/types';
+import { WikiTopic, Difficulty, DIFFICULTY_CONFIG, QuestionCategory, CategoryData, Round, PlayedQuestion, QuestionRating } from '@/types';
 import { redactExcerpt } from '@/lib/wikipedia';
 import { useSound } from '@/hooks/useSound';
+import { useRatings } from '@/hooks/useRatings';
 import { Timer } from './Timer';
 import { MultipleChoice } from './MultipleChoice';
 import { ScoreDisplay } from './ScoreDisplay';
 import { RoundResult } from './RoundResult';
 import { CategoryPrompt } from './CategoryPrompt';
+import { QuestionRatingModal } from './QuestionRatingModal';
 import styles from './GameBoard.module.css';
 
 interface GameBoardProps {
@@ -43,6 +45,8 @@ interface GameBoardProps {
     category?: QuestionCategory;
     categoryData?: CategoryData;
     correctAnswer?: string;
+    // For rating system
+    rounds: Round[];
 }
 
 export function GameBoard({
@@ -64,10 +68,13 @@ export function GameBoard({
     category = 'wiki_what',
     categoryData,
     correctAnswer,
+    rounds,
 }: GameBoardProps) {
     const config = DIFFICULTY_CONFIG[difficulty];
     const { toggleMute, isMuted } = useSound();
+    const { submitRatings } = useRatings();
     const [soundEnabled, setSoundEnabled] = useState(true);
+    const [showRatingModal, setShowRatingModal] = useState(false);
 
     // Sync with stored preference
     useEffect(() => {
@@ -75,9 +82,33 @@ export function GameBoard({
         setSoundEnabled(!isMuted());
     }, [isMuted]);
 
+    // Show rating modal when game finishes
+    useEffect(() => {
+        if (phase === 'finished') {
+            setShowRatingModal(true);
+        }
+    }, [phase]);
+
     const handleToggleSound = () => {
         toggleMute();
         setSoundEnabled(!soundEnabled);
+    };
+
+    // Prepare played questions for rating
+    const playedQuestions: PlayedQuestion[] = rounds.map(round => ({
+        id: round.questionId,
+        category: round.category,
+        title: round.correctAnswer,  // Use correct answer as display title
+        roundNumber: round.roundNumber
+    }));
+
+    const handleSubmitRatings = async (ratings: QuestionRating[]) => {
+        await submitRatings(ratings);
+        setShowRatingModal(false);
+    };
+
+    const handleSkipRatings = () => {
+        setShowRatingModal(false);
     };
 
     // Determine MultipleChoice variant based on category
@@ -114,6 +145,17 @@ export function GameBoard({
                 alert('Score copied to clipboard!');
             }
         };
+
+        // Show rating modal first if enabled
+        if (showRatingModal) {
+            return (
+                <QuestionRatingModal
+                    questions={playedQuestions}
+                    onSubmit={handleSubmitRatings}
+                    onSkip={handleSkipRatings}
+                />
+            );
+        }
 
         return (
             <div className={styles.finishedContainer}>

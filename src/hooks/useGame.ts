@@ -222,6 +222,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'wiki_what' as QuestionCategory,
+                            questionId: `wiki_what_${roundData.topic.id}`,  // ID for rating system
                             topic: roundData.topic,
                             options: shuffleArray(allOptions),
                             correctAnswer: roundData.topic.title,
@@ -238,6 +239,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'odd_wiki_out' as QuestionCategory,
+                            questionId: data.id,  // ID for rating system
                             topic: createPlaceholderTopic('Odd Wiki Out', data.source),
                             options: data.items,
                             correctAnswer: data.items[data.impostorIndex],
@@ -254,6 +256,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'when_in_wiki' as QuestionCategory,
+                            questionId: data.id,  // ID for rating system
                             topic: createPlaceholderTopic('When in Wiki?', data.source),
                             options: data.yearOptions.map(y => y.toString()),
                             correctAnswer: data.correctYear.toString(),
@@ -270,6 +273,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'wiki_or_fiction' as QuestionCategory,
+                            questionId: data.id,  // ID for rating system
                             topic: createPlaceholderTopic('Wiki or Fiction?', data.source),
                             options: ['TRUE', 'FALSE'],
                             correctAnswer: data.isTrue ? 'TRUE' : 'FALSE',
@@ -288,6 +292,7 @@ export function useGame(): UseGameReturn {
                         return {
                             ...baseRound,
                             category: 'wiki_links' as QuestionCategory,
+                            questionId: data.id,  // ID for rating system
                             topic: createPlaceholderTopic('Wiki Links', data.source),
                             options: shuffleArray(options),
                             correctAnswer: data.connection,
