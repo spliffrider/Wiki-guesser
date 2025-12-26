@@ -162,6 +162,14 @@ export default function HomePage() {
       </main>
 
       <footer className={styles.footer}>
+        <a
+          href="https://donate.wikimedia.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.donateButton}
+        >
+          ❤️ Donate to Wikipedia
+        </a>
         <p>Powered by Wikipedia • Built with ❤️</p>
       </footer>
     </div>
