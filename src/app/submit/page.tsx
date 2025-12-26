@@ -71,7 +71,8 @@ export default function SubmitHubPage() {
             const article = await fetchWikipediaArticle(wikiUrl);
             if (article) {
                 setWikiData(article);
-                setStep('category');
+                // Don't auto-advance to category step, let user see preview first
+                // setStep('category'); 
             }
         } catch (error) {
             setFetchError(error instanceof Error ? error.message : 'Failed to fetch article');
@@ -86,7 +87,12 @@ export default function SubmitHubPage() {
         try {
             const url = await fetchRandomWikipediaUrl();
             setWikiUrl(url);
-            // Optional: Auto-fetch could happen here, but we'll let user click fetch
+
+            // Immediately fetch the article data
+            const article = await fetchWikipediaArticle(url);
+            if (article) {
+                setWikiData(article);
+            }
         } catch (error) {
             setFetchError('Failed to get random suggestion');
         } finally {
@@ -187,18 +193,57 @@ export default function SubmitHubPage() {
                                 </button>
                             </div>
                             {fetchError && <p className={styles.errorText}>{fetchError}</p>}
-                            <button className={styles.skipButton} onClick={handleSkip}>
-                                Skip → Create Manually
-                            </button>
-                            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                                <button
-                                    className={styles.randomButton}
-                                    onClick={handleRandom}
-                                    disabled={isRandomizing}
-                                >
-                                    {isRandomizing ? 'Rolling...' : '🎲 Random Suggestion'}
+
+                            {wikiData ? (
+                                <div className={styles.wikiPreview} style={{ marginTop: '2rem', textAlign: 'left' }}>
+                                    <div className={styles.wikiPreviewContent}>
+                                        <div className={styles.wikiPreviewImageWrapper}>
+                                            {wikiData.thumbnail ? (
+                                                /* eslint-disable-next-line @next/next/no-img-element */
+                                                <img
+                                                    src={wikiData.thumbnail}
+                                                    alt={wikiData.title}
+                                                    className={styles.wikiPreviewImage}
+                                                />
+                                            ) : (
+                                                <div className={styles.wikiPreviewPlaceholder}>W</div>
+                                            )}
+                                        </div>
+                                        <div className={styles.wikiPreviewText}>
+                                            <span className={styles.wikiPreviewLabel}>Selected Article</span>
+                                            <h3 className={styles.wikiPreviewTitle}>{wikiData.title}</h3>
+                                            <span className={styles.wikiPreviewDescription}>{wikiData.description}</span>
+                                            {wikiData.extract && (
+                                                <p className={styles.wikiPreviewExtract}>{wikiData.extract}</p>
+                                            )}
+                                            <div style={{ marginTop: '1rem' }}>
+                                                <button
+                                                    className={styles.fetchButton}
+                                                    onClick={() => setStep('category')}
+                                                >
+                                                    Continue to Step 2 →
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                                    <button
+                                        className={styles.randomButton}
+                                        onClick={handleRandom}
+                                        disabled={isRandomizing}
+                                    >
+                                        {isRandomizing ? 'Rolling...' : '🎲 Random Suggestion'}
+                                    </button>
+                                </div>
+                            )}
+
+                            {!wikiData && (
+                                <button className={styles.skipButton} onClick={handleSkip} style={{ marginTop: '1rem' }}>
+                                    Skip → Create Manually
                                 </button>
-                            </div>
+                            )}
                         </div>
                     </section>
                 )}
@@ -213,6 +258,9 @@ export default function SubmitHubPage() {
                             <h2 className={styles.sectionTitle}>📋 Step 2: Choose Question Type</h2>
                         </div>
 
+                        {/* Preview is now shown in step 1, but we can keep a smaller summary or full preview here too for context if needed. 
+                             For now, keeping the full preview for consistency/context.
+                         */}
                         {wikiData && (
                             <div className={styles.wikiPreview}>
                                 <div className={styles.wikiPreviewContent}>
