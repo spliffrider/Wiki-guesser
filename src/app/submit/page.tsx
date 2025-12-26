@@ -216,12 +216,19 @@ export default function SubmitHubPage() {
                                             {wikiData.extract && (
                                                 <p className={styles.wikiPreviewExtract}>{wikiData.extract}</p>
                                             )}
-                                            <div style={{ marginTop: '1rem' }}>
+                                            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                                 <button
                                                     className={styles.fetchButton}
                                                     onClick={() => setStep('category')}
                                                 >
                                                     Continue to Step 2 →
+                                                </button>
+                                                <button
+                                                    className={styles.randomButton}
+                                                    onClick={handleRandom}
+                                                    disabled={isRandomizing}
+                                                >
+                                                    {isRandomizing ? 'Rolling...' : '🎲 Try Another'}
                                                 </button>
                                             </div>
                                         </div>
