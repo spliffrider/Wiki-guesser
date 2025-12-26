@@ -215,9 +215,28 @@ export default function SubmitHubPage() {
 
                         {wikiData && (
                             <div className={styles.wikiPreview}>
-                                <span className={styles.wikiPreviewLabel}>Creating from:</span>
-                                <strong>{wikiData.title}</strong>
-                                {wikiData.description && <span> — {wikiData.description}</span>}
+                                <div className={styles.wikiPreviewContent}>
+                                    <div className={styles.wikiPreviewImageWrapper}>
+                                        {wikiData.thumbnail ? (
+                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                            <img
+                                                src={wikiData.thumbnail}
+                                                alt={wikiData.title}
+                                                className={styles.wikiPreviewImage}
+                                            />
+                                        ) : (
+                                            <div className={styles.wikiPreviewPlaceholder}>W</div>
+                                        )}
+                                    </div>
+                                    <div className={styles.wikiPreviewText}>
+                                        <span className={styles.wikiPreviewLabel}>Selected Article</span>
+                                        <h3 className={styles.wikiPreviewTitle}>{wikiData.title}</h3>
+                                        <span className={styles.wikiPreviewDescription}>{wikiData.description}</span>
+                                        {wikiData.extract && (
+                                            <p className={styles.wikiPreviewExtract}>{wikiData.extract}</p>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
 
