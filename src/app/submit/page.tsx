@@ -145,6 +145,11 @@ export default function SubmitHubPage() {
         <div className={styles.container}>
             <main className={styles.main}>
                 <header className={styles.header}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                        <Link href="/about" className={styles.skipButton} style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}>
+                            ℹ️ About
+                        </Link>
+                    </div>
                     <h1 className={styles.title}>Creator Hub</h1>
                     <p className={styles.subtitle}>Help expand the Wiki Guesser universe and earn points!</p>
                 </header>
