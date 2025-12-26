@@ -327,6 +327,15 @@
     margin-bottom: var(--space-8);
     box-shadow: var(--shadow-sm);
     animation: fadeIn 0.3s ease-out;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    position: relative;
+}
+
+.wikiPreview:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
 }
 
 .wikiPreviewContent {

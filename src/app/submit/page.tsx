@@ -195,7 +195,18 @@ export default function SubmitHubPage() {
                             {fetchError && <p className={styles.errorText}>{fetchError}</p>}
 
                             {wikiData ? (
-                                <div className={styles.wikiPreview} style={{ marginTop: '2rem', textAlign: 'left' }}>
+                                <div
+                                    className={styles.wikiPreview}
+                                    style={{ marginTop: '2rem', textAlign: 'left' }}
+                                    onClick={() => window.open(wikiUrl, '_blank')}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            window.open(wikiUrl, '_blank');
+                                        }
+                                    }}
+                                >
                                     <div className={styles.wikiPreviewContent}>
                                         <div className={styles.wikiPreviewImageWrapper}>
                                             {wikiData.thumbnail ? (
@@ -210,7 +221,7 @@ export default function SubmitHubPage() {
                                             )}
                                         </div>
                                         <div className={styles.wikiPreviewText}>
-                                            <span className={styles.wikiPreviewLabel}>Selected Article</span>
+                                            <span className={styles.wikiPreviewLabel}>Selected Article <small>(Click to view)</small></span>
                                             <h3 className={styles.wikiPreviewTitle}>{wikiData.title}</h3>
                                             <span className={styles.wikiPreviewDescription}>{wikiData.description}</span>
                                             {wikiData.extract && (
@@ -219,13 +230,19 @@ export default function SubmitHubPage() {
                                             <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                                 <button
                                                     className={styles.fetchButton}
-                                                    onClick={() => setStep('category')}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setStep('category');
+                                                    }}
                                                 >
                                                     Continue to Step 2 →
                                                 </button>
                                                 <button
                                                     className={styles.randomButton}
-                                                    onClick={handleRandom}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRandom();
+                                                    }}
                                                     disabled={isRandomizing}
                                                 >
                                                     {isRandomizing ? 'Rolling...' : '🎲 Try Another'}
@@ -269,7 +286,13 @@ export default function SubmitHubPage() {
                              For now, keeping the full preview for consistency/context.
                          */}
                         {wikiData && (
-                            <div className={styles.wikiPreview}>
+                            <div
+                                className={styles.wikiPreview}
+                                onClick={() => window.open(wikiUrl, '_blank')}
+                                role="button"
+                                tabIndex={0}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <div className={styles.wikiPreviewContent}>
                                     <div className={styles.wikiPreviewImageWrapper}>
                                         {wikiData.thumbnail ? (
@@ -284,7 +307,7 @@ export default function SubmitHubPage() {
                                         )}
                                     </div>
                                     <div className={styles.wikiPreviewText}>
-                                        <span className={styles.wikiPreviewLabel}>Selected Article</span>
+                                        <span className={styles.wikiPreviewLabel}>Selected Article <small>(Click to view)</small></span>
                                         <h3 className={styles.wikiPreviewTitle}>{wikiData.title}</h3>
                                         <span className={styles.wikiPreviewDescription}>{wikiData.description}</span>
                                         {wikiData.extract && (
