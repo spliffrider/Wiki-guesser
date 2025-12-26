@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUGC } from '@/hooks/useUGC';
 import { UserRewardSummary } from '@/types/ugc';
-import { fetchWikipediaArticle, isValidWikipediaUrl, WikipediaArticle } from '@/lib/wikipediaApi';
+import { fetchWikipediaArticle, isValidWikipediaUrl, WikipediaArticle, fetchRandomWikipediaUrl } from '@/lib/wikipediaApi';
 import styles from './page.module.css';
 
 const CATEGORIES = [
@@ -53,6 +53,7 @@ export default function SubmitHubPage() {
     const [isFetching, setIsFetching] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [wikiData, setWikiData] = useState<WikipediaArticle | null>(null);
+    const [isRandomizing, setIsRandomizing] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -76,6 +77,20 @@ export default function SubmitHubPage() {
             setFetchError(error instanceof Error ? error.message : 'Failed to fetch article');
         } finally {
             setIsFetching(false);
+        }
+    };
+
+    const handleRandom = async () => {
+        setIsRandomizing(true);
+        setFetchError(null);
+        try {
+            const url = await fetchRandomWikipediaUrl();
+            setWikiUrl(url);
+            // Optional: Auto-fetch could happen here, but we'll let user click fetch
+        } catch (error) {
+            setFetchError('Failed to get random suggestion');
+        } finally {
+            setIsRandomizing(false);
         }
     };
 
@@ -175,6 +190,15 @@ export default function SubmitHubPage() {
                             <button className={styles.skipButton} onClick={handleSkip}>
                                 Skip → Create Manually
                             </button>
+                            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                                <button
+                                    className={styles.randomButton}
+                                    onClick={handleRandom}
+                                    disabled={isRandomizing}
+                                >
+                                    {isRandomizing ? 'Rolling...' : '🎲 Random Suggestion'}
+                                </button>
+                            </div>
                         </div>
                     </section>
                 )}

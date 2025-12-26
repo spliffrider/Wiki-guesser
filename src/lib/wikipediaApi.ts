@@ -90,3 +90,33 @@ export function isValidWikipediaUrl(url: string): boolean {
         return false;
     }
 }
+
+/**
+ * Fetch a random Wikipedia article URL
+ * Uses the Wikipedia API random list generator
+ */
+export async function fetchRandomWikipediaUrl(lang: string = 'en'): Promise<string> {
+    const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Failed to fetch random article');
+        }
+
+        const data = await response.json();
+        const article = data.query?.random?.[0];
+
+        if (article && article.title) {
+            // Encode spaces as underscores for URL
+            const encodedTitle = article.title.replace(/ /g, '_');
+            // Encode other characters properly
+            return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(encodedTitle)}`;
+        }
+
+        throw new Error('No random article found');
+    } catch (error) {
+        console.error('Error fetching random Wikipedia URL:', error);
+        throw error;
+    }
+}
