@@ -16,7 +16,7 @@ export function WikiWhatFields({ data, updateData }: any) {
             )}
 
             <div className={styles.formGroup}>
-                <label className={styles.label}>Article Title (The Answer)</label>
+                <label className={styles.label}>Correct Answer (Article Title)</label>
                 <input
                     className={styles.input}
                     value={data.title}
@@ -24,6 +24,7 @@ export function WikiWhatFields({ data, updateData }: any) {
                     placeholder="e.g., Albert Einstein"
                     required
                 />
+                <span className={styles.helperText}>This will be the text on the correct answer button.</span>
             </div>
 
             <div className={styles.formGroup}>
