@@ -96,7 +96,8 @@ export function isValidWikipediaUrl(url: string): boolean {
  * Uses the Wikipedia API random list generator
  */
 export async function fetchRandomWikipediaUrl(lang: string = 'en'): Promise<string> {
-    const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*`;
+    // requesting 5 random pages with pageimages to increase chance of getting one with a thumbnail
+    const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&generator=random&grnnamespace=0&grnlimit=5&prop=pageimages&pithumbsize=500&format=json&origin=*`;
 
     try {
         const response = await fetch(apiUrl);
@@ -105,11 +106,21 @@ export async function fetchRandomWikipediaUrl(lang: string = 'en'): Promise<stri
         }
 
         const data = await response.json();
-        const article = data.query?.random?.[0];
+        const pages = data.query?.pages;
 
-        if (article && article.title) {
+        if (!pages) {
+            throw new Error('No random article found');
+        }
+
+        const pageValues = Object.values(pages) as any[];
+
+        // Prioritize pages with a thumbnail
+        const pageWithImage = pageValues.find((p: any) => p.thumbnail?.source);
+        const selectedPage = pageWithImage || pageValues[0];
+
+        if (selectedPage && selectedPage.title) {
             // Encode spaces as underscores for URL
-            const encodedTitle = article.title.replace(/ /g, '_');
+            const encodedTitle = selectedPage.title.replace(/ /g, '_');
             // Encode other characters properly
             return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(encodedTitle)}`;
         }
