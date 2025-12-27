@@ -7,32 +7,64 @@ const WIKI_ACTION_API = 'https://en.wikipedia.org/w/api.php';
 
 /**
  * Fetches random Wikipedia articles
+ * Includes retry logic and overfetch to handle filtered articles
  */
 export async function getRandomTopics(count: number = 5): Promise<WikiTopic[]> {
-    try {
-        // Use the random article API
-        const response = await fetch(
-            `${WIKI_ACTION_API}?action=query&list=random&rnnamespace=0&rnlimit=${count}&format=json&origin=*`
-        );
+    const allTopics: WikiTopic[] = [];
+    const seenTitles = new Set<string>();
+    const maxAttempts = 3;
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch random articles');
+    // Request more than needed since some will be filtered out
+    const fetchCount = Math.min(count * 2, 50); // Request up to 2x, max 50
+
+    for (let attempt = 0; attempt < maxAttempts && allTopics.length < count; attempt++) {
+        try {
+            // Use the random article API
+            const response = await fetch(
+                `${WIKI_ACTION_API}?action=query&list=random&rnnamespace=0&rnlimit=${fetchCount}&format=json&origin=*`
+            );
+
+            if (!response.ok) {
+                console.warn(`[wikipedia] Random fetch attempt ${attempt + 1} failed: ${response.status}`);
+                continue;
+            }
+
+            const data = await response.json();
+            const randomPages = data.query?.random || [];
+
+            if (randomPages.length === 0) {
+                console.warn(`[wikipedia] No random pages returned on attempt ${attempt + 1}`);
+                continue;
+            }
+
+            // Fetch details for each random article (in parallel for speed)
+            const detailPromises = randomPages
+                .filter((page: { title: string }) => !seenTitles.has(page.title))
+                .map((page: { title: string }) => {
+                    seenTitles.add(page.title);
+                    return getArticleDetails(page.title);
+                });
+
+            const results = await Promise.all(detailPromises);
+
+            // Filter out any failed fetches and add to collection
+            for (const topic of results) {
+                if (topic !== null && allTopics.length < count) {
+                    allTopics.push(topic);
+                }
+            }
+
+            console.log(`[wikipedia] Attempt ${attempt + 1}: Got ${allTopics.length}/${count} topics`);
+        } catch (error) {
+            console.error(`[wikipedia] Error on attempt ${attempt + 1}:`, error);
         }
-
-        const data = await response.json();
-        const randomPages = data.query.random;
-
-        // Fetch details for each random article
-        const topics = await Promise.all(
-            randomPages.map((page: { title: string }) => getArticleDetails(page.title))
-        );
-
-        // Filter out any failed fetches
-        return topics.filter((topic): topic is WikiTopic => topic !== null);
-    } catch (error) {
-        console.error('Error fetching random topics:', error);
-        return [];
     }
+
+    if (allTopics.length < count) {
+        console.warn(`[wikipedia] Only got ${allTopics.length}/${count} topics after ${maxAttempts} attempts`);
+    }
+
+    return allTopics;
 }
 
 /**
