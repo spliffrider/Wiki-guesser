@@ -11,7 +11,7 @@
 
 | Agent | Task | Status | Started | Blocked By |
 |-------|------|--------|---------|------------|
-| GEMINI | Question rating system (post-game feedback) | 🔵 Review | 2025-12-26 | User review of design decisions |
+| GEMINI | Blitz Mode & XP Verification | 🟡 Waiting | 2025-12-27 | User Handoff |
 
 ## Status Legend
 - 🟢 Active - Currently working
@@ -23,6 +23,8 @@
 
 | Agent | Task | Completed |
 |-------|------|-----------|
+| GEMINI | XP System & Progression Implementation | 2025-12-27 |
+| GEMINI | Blitz Mode (Fast-paced Multiplayer) | 2025-12-27 |
 | GEMINI | Anonymous question submission system (code complete) | 2025-12-25 |
 | GEMINI | Multiplayer share URL feature | 2025-12-25 |
 | CLAUDE (Oscar) | Multiplayer backend verification | 2025-12-25 |
