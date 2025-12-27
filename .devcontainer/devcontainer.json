@@ -2,15 +2,8 @@
     "name": "Wiki-Guesser Dev Container",
     "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
     "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.11"
-        },
-        "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/common-utils:2": {
-            "installZsh": true,
-            "installOhMyZsh": true,
-            "upgradePackages": true
         }
     },
     "postCreateCommand": "npm install && pip install google-generativeai wikipedia-api pageviewapi python-dotenv",
@@ -19,8 +12,7 @@
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
-                "ms-python.python",
-                "bradlc.vscode-tailwindcss"
+                "ms-python.python"
             ]
         }
     },
