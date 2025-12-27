@@ -17,6 +17,7 @@ import {
     nextRound,
     leaveRoom,
     joinRoom,
+    getRoomQuestions,
 } from '@/lib/multiplayer';
 
 interface MultiplayerGameState {
@@ -28,6 +29,8 @@ interface MultiplayerGameState {
     roundStartTime: number | null;
     hasAnswered: boolean;
     lastAnswer: { points: number; isCorrect: boolean } | null;
+    blitzQuestions: RoomQuestion[];
+    blitzIndex: number;
 }
 
 interface UseMultiplayerGameProps {
@@ -47,6 +50,8 @@ export function useMultiplayerGame({ roomCode, userId, username }: UseMultiplaye
         roundStartTime: null,
         hasAnswered: false,
         lastAnswer: null,
+        blitzQuestions: [],
+        blitzIndex: 0,
     });
 
     const [error, setError] = useState<string | null>(null);
@@ -93,7 +98,25 @@ export function useMultiplayerGame({ roomCode, userId, username }: UseMultiplaye
         }
 
         let question: RoomQuestion | null = null;
-        if (room.status === 'playing' && room.current_round > 0) {
+        let blitzQuestions: RoomQuestion[] = [];
+        let blitzIndex = 0;
+
+        if (room.mode === 'blitz' && room.status === 'playing') {
+            // Blitz: Fetch all questions
+            blitzQuestions = await getRoomQuestions(room.id);
+
+            // Calculate my progress
+            const myAnswers = await supabase
+                .from('room_answers')
+                .select('*', { count: 'exact', head: true })
+                .eq('room_id', room.id)
+                .eq('user_id', userId);
+
+            blitzIndex = myAnswers.count || 0;
+            question = blitzQuestions[blitzIndex] || null;
+
+        } else if (room.status === 'playing' && room.current_round > 0) {
+            // Standard: Fetch current question
             question = await getCurrentQuestion(room.id, room.current_round);
         }
 
@@ -102,8 +125,11 @@ export function useMultiplayerGame({ roomCode, userId, username }: UseMultiplaye
             room,
             players,
             currentQuestion: question,
+            blitzQuestions,
+            blitzIndex,
             phase: room.status === 'lobby' ? 'lobby' :
-                room.status === 'finished' ? 'finished' : 'playing',
+                room.status === 'finished' ? 'finished' :
+                    (room.mode === 'blitz' && blitzIndex >= 5) ? 'results' : 'playing',
         }));
     }, [roomCode, userId, username]);
 
@@ -227,12 +253,21 @@ export function useMultiplayerGame({ roomCode, userId, username }: UseMultiplaye
     const answer = useCallback(async (answerText: string) => {
         if (!state.room?.id || !state.currentQuestion || state.hasAnswered) return;
 
+        // Use global timer for Blitz, relative for Standard?
+        // Actually for Blitz, points might depend on speed too?
+        // For now use same 30s logic or just raw time.
+        // Blitz time limit is different (120s). 
+        // Speed bonus logic in backend relies on 30s.
+        // We might want to adjust backend scoring for Blitz later. For now, keep as is.
         const timeMs = state.roundStartTime ? Date.now() - state.roundStartTime : 30000;
+
+        const isBlitz = state.room.mode === 'blitz';
+        const roundNum = isBlitz ? state.blitzIndex + 1 : state.room.current_round;
 
         const result = await submitAnswer(
             state.room.id,
             userId,
-            state.room.current_round,
+            roundNum,
             answerText,
             timeMs,
             state.currentQuestion.correct_answer
@@ -243,7 +278,27 @@ export function useMultiplayerGame({ roomCode, userId, username }: UseMultiplaye
             hasAnswered: true,
             lastAnswer: result,
         }));
-    }, [state.room, state.currentQuestion, state.hasAnswered, state.roundStartTime, userId]);
+
+        if (isBlitz) {
+            // Auto-advance after 1.5s
+            setTimeout(() => {
+                setState(prev => {
+                    const nextIndex = prev.blitzIndex + 1;
+                    const nextQ = prev.blitzQuestions[nextIndex] || null;
+                    const isFinished = !nextQ && nextIndex >= 5;
+
+                    return {
+                        ...prev,
+                        hasAnswered: false,
+                        lastAnswer: null, // Clear result to show next question
+                        blitzIndex: nextIndex,
+                        currentQuestion: nextQ,
+                        phase: isFinished ? 'results' : 'playing'
+                    };
+                });
+            }, 1500);
+        }
+    }, [state.room, state.currentQuestion, state.hasAnswered, state.roundStartTime, state.blitzIndex, state.blitzQuestions, userId]);
 
     const advanceRound = useCallback(async () => {
         if (!roomId) return;

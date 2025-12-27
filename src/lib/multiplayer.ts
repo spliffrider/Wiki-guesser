@@ -40,6 +40,7 @@ export interface GameRoom {
     created_at: string;
     started_at: string | null;
     finished_at: string | null;
+    mode: 'standard' | 'blitz';
 }
 
 export interface RoomPlayer {
@@ -90,7 +91,11 @@ function generateRoomCode(): string {
 /**
  * Create a new game room
  */
-export async function createRoom(hostId: string, hostUsername: string): Promise<{ room: GameRoom | null; error: string | null }> {
+export async function createRoom(
+    hostId: string,
+    hostUsername: string,
+    mode: 'standard' | 'blitz' = 'standard'
+): Promise<{ room: GameRoom | null; error: string | null }> {
     const supabase = getSupabaseClient();
 
     // Generate unique code (retry if collision)
@@ -103,7 +108,16 @@ export async function createRoom(hostId: string, hostUsername: string): Promise<
             const { data: room, error } = await withTimeout(
                 supabase
                     .from('game_rooms')
-                    .insert({ code, host_id: hostId })
+                    .insert({
+                        code,
+                        host_id: hostId,
+                        status: 'lobby',
+                        current_round: 0,
+                        total_rounds: 5,
+                        time_per_round: mode === 'blitz' ? 120 : 30, // 30s per round for standard, 120s total for blitz
+                        max_players: 8,
+                        mode,
+                    })
                     .select()
                     .single(),
                 QUERY_TIMEOUT_MS,
@@ -543,4 +557,28 @@ export async function getRoundAnswers(roomId: string, roundNumber: number): Prom
         .order('answered_at', { ascending: true });
 
     return (data || []) as RoomAnswer[];
+}
+
+/**
+ * Get all room questions (for Blitz mode)
+ */
+export async function getRoomQuestions(roomId: string): Promise<RoomQuestion[]> {
+    const supabase = getSupabaseClient();
+
+    try {
+        const { data } = await withTimeout(
+            supabase
+                .from('room_questions')
+                .select('*')
+                .eq('room_id', roomId)
+                .order('round_number', { ascending: true }),
+            QUERY_TIMEOUT_MS,
+            'Getting questions timed out'
+        );
+
+        return (data || []) as RoomQuestion[];
+    } catch (err) {
+        console.error('[multiplayer] getRoomQuestions error:', err);
+        return [];
+    }
 }

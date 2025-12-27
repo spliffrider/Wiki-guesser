@@ -34,11 +34,15 @@ export default function MultiplayerRoomPage() {
         answer,
         advanceRound,
         leave,
+        blitzIndex,
     } = useMultiplayerGame({
         roomCode: code,
         userId: user?.id || '',
         username: profile?.username || 'Guest',
     });
+
+    const isBlitz = room?.mode === 'blitz';
+    const blitzIndexSafe = blitzIndex || 0;
 
     // Redirect if not logged in
     useEffect(() => {
@@ -99,7 +103,7 @@ export default function MultiplayerRoomPage() {
                 <Header />
                 <main className={styles.main}>
                     <div className={styles.roomHeader}>
-                        <h1>Room:</h1>
+                        <h1>{isBlitz ? '⚡ Blitz Room:' : 'Room:'}</h1>
                         <div className={styles.roomCodeWrapper}>
                             <span className={styles.roomCode}>{code}</span>
                             <button onClick={handleCopyCode} className={styles.copyBtn} title="Copy invite link">
@@ -185,7 +189,7 @@ export default function MultiplayerRoomPage() {
                 <Header />
                 <main className={styles.gameMain}>
                     <div className={styles.gameHeader}>
-                        <span>Round {room?.current_round}/{room?.total_rounds}</span>
+                        <span>{isBlitz ? `Question ${blitzIndex + 1}/5` : `Round ${room?.current_round}/${room?.total_rounds}`}</span>
                         <span className={styles.timer}>
                             {Math.ceil(timeRemaining / 1000)}s
                         </span>
@@ -199,7 +203,8 @@ export default function MultiplayerRoomPage() {
                         <div className={`${styles.answered} ${lastAnswer?.isCorrect ? styles.correct : styles.incorrect}`}>
                             <h2>{lastAnswer?.isCorrect ? '✓ Correct!' : '✗ Wrong!'}</h2>
                             <p>+{lastAnswer?.points || 0} points</p>
-                            <p className={styles.waitingText}>Waiting for other players...</p>
+                            {!isBlitz && <p className={styles.waitingText}>Waiting for other players...</p>}
+                            {isBlitz && <p className={styles.waitingText}>Next question coming up...</p>}
                         </div>
                     ) : (
                         <div className={styles.options}>
@@ -252,12 +257,15 @@ export default function MultiplayerRoomPage() {
                             ))}
                         </div>
 
-                        {isHost && (
+                        {isHost && !isBlitz && (
                             <button onClick={advanceRound} className={styles.nextBtn}>
                                 {room?.current_round === room?.total_rounds
                                     ? 'See Final Results'
                                     : 'Next Round →'}
                             </button>
+                        )}
+                        {isBlitz && (
+                            <p className={styles.waitingText}>Waiting for game to end...</p>
                         )}
                     </div>
                 </main>

@@ -19,6 +19,7 @@ export default function MultiplayerLobbyPage() {
 
     const [joinCode, setJoinCode] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [gameMode, setGameMode] = useState<'standard' | 'blitz'>('standard');
     const [isJoining, setIsJoining] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [timedOut, setTimedOut] = useState(false);
@@ -42,7 +43,8 @@ export default function MultiplayerLobbyPage() {
 
         const { room, error: createError } = await createRoom(
             user.id,
-            profile.username || 'Player'
+            profile.username || 'Player',
+            gameMode
         );
 
         if (createError) {
@@ -131,6 +133,22 @@ export default function MultiplayerLobbyPage() {
                     <div className={styles.optionCard}>
                         <h2>Create Room</h2>
                         <p>Start a new game and invite friends with a code</p>
+
+                        <div className={styles.modeSelector}>
+                            <button
+                                className={`${styles.modeBtn} ${gameMode === 'standard' ? styles.activeMode : ''}`}
+                                onClick={() => setGameMode('standard')}
+                            >
+                                Classic
+                            </button>
+                            <button
+                                className={`${styles.modeBtn} ${gameMode === 'blitz' ? styles.activeMode : ''}`}
+                                onClick={() => setGameMode('blitz')}
+                            >
+                                Blitz ⚡
+                            </button>
+                        </div>
+
                         <button
                             onClick={handleCreate}
                             disabled={isCreating}
