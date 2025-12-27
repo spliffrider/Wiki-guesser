@@ -37,6 +37,7 @@ export default function MultiplayerRoomPage() {
     } = useMultiplayerGame({
         roomCode: code,
         userId: user?.id || '',
+        username: profile?.username || 'Guest',
     });
 
     // Redirect if not logged in

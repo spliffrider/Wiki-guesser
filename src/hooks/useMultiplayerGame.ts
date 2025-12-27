@@ -16,6 +16,7 @@ import {
     startGame,
     nextRound,
     leaveRoom,
+    joinRoom,
 } from '@/lib/multiplayer';
 
 interface MultiplayerGameState {
@@ -32,10 +33,12 @@ interface MultiplayerGameState {
 interface UseMultiplayerGameProps {
     roomCode: string;
     userId: string;
+    username: string; // Added username
 }
 
-export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps) {
+export function useMultiplayerGame({ roomCode, userId, username }: UseMultiplayerGameProps) {
     const [state, setState] = useState<MultiplayerGameState>({
+        // ... (existing initial state)
         room: null,
         players: [],
         currentQuestion: null,
@@ -50,16 +53,44 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const supabase = getSupabaseClient();
     const roomId = state.room?.id;
+    const joiningRef = useRef(false); // Prevent double joins
 
     // Fetch initial room state
     const fetchRoomState = useCallback(async () => {
+        if (!roomCode || !userId || !username) return;
+
         const room = await getRoomByCode(roomCode);
         if (!room) {
             setError('Room not found');
             return;
         }
 
-        const players = await getRoomPlayers(room.id);
+        let players = await getRoomPlayers(room.id);
+
+        // Check if I am in the list
+        const amIInList = players.some(p => p.user_id === userId);
+
+        if (!amIInList && !joiningRef.current && room.status === 'lobby') {
+            // Auto-join
+            joiningRef.current = true;
+            console.log('[useMultiplayerGame] Auto-joining room...');
+
+            const joinResult = await joinRoom(room.code, userId, username);
+
+            if (joinResult.error) {
+                console.error('[useMultiplayerGame] Auto-join failed:', joinResult.error);
+                setError(joinResult.error);
+                joiningRef.current = false;
+                return;
+            }
+
+            // Refetch players
+            players = await getRoomPlayers(room.id);
+            joiningRef.current = false;
+        } else if (!amIInList && room.status !== 'lobby') {
+            setError('Game already in progress');
+            return;
+        }
 
         let question: RoomQuestion | null = null;
         if (room.status === 'playing' && room.current_round > 0) {
@@ -74,11 +105,10 @@ export function useMultiplayerGame({ roomCode, userId }: UseMultiplayerGameProps
             phase: room.status === 'lobby' ? 'lobby' :
                 room.status === 'finished' ? 'finished' : 'playing',
         }));
-    }, [roomCode]);
+    }, [roomCode, userId, username]);
 
     // Initial load
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchRoomState();
     }, [fetchRoomState]);
 
