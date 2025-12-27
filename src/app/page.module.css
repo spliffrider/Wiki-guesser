@@ -104,8 +104,9 @@
 }
 
 .playButton {
-  width: 100%;
-  padding: var(--space-5) var(--space-8);
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: var(--space-5) var(--space-4);
   font-family: var(--font-serif);
   font-size: var(--text-xl);
   font-weight: var(--font-weight-bold);
@@ -132,12 +133,14 @@
 
 .playButtons {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
 }
 
 .multiplayerButton {
-  flex: 1;
-  padding: var(--space-5) var(--space-8);
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: var(--space-5) var(--space-4);
   font-family: var(--font-serif);
   font-size: var(--text-lg);
   font-weight: var(--font-weight-bold);

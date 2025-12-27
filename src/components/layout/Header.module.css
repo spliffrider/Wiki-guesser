@@ -238,7 +238,6 @@
 .themeToggle:hover {
     background: var(--color-primary-light);
     border-color: var(--color-primary);
-    transform: rotate(20deg);
 }
 
 /* Theme selector dropdown */
