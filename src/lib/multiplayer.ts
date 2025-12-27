@@ -135,10 +135,13 @@ export async function createRoom(hostId: string, hostUsername: string): Promise<
             );
 
             if (playerError) {
+                console.error('[multiplayer] Failed to add host to room:', playerError);
                 // Cleanup room if player insert fails
                 await supabase.from('game_rooms').delete().eq('id', room.id);
-                return { room: null, error: playerError.message };
+                return { room: null, error: `Failed to add you to the room: ${playerError.message}` };
             }
+
+            console.log('[multiplayer] Room created successfully:', { roomId: room.id, code: room.code, hostId });
 
             return { room: room as GameRoom, error: null };
         } catch (err) {
@@ -224,9 +227,11 @@ export async function joinRoom(
         );
 
         if (joinError) {
-            return { room: null, error: joinError.message };
+            console.error('[multiplayer] Failed to join room:', joinError);
+            return { room: null, error: `Failed to join room: ${joinError.message}` };
         }
 
+        console.log('[multiplayer] Player joined room:', { roomId: room.id, code: room.code, userId });
         return { room: room as GameRoom, error: null };
     } catch (err) {
         return { room: null, error: err instanceof Error ? err.message : 'Failed to join room' };
