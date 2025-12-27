@@ -6,6 +6,9 @@
             "version": "3.11"
         }
     },
+    "mounts": [
+        "source=${localWorkspaceFolder}/.env.local,target=/workspaces/wiki-guesser/.env.local,type=bind"
+    ],
     "postCreateCommand": "npm install && pip install google-generativeai wikipedia-api pageviewapi python-dotenv",
     "customizations": {
         "vscode": {
