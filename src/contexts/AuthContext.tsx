@@ -60,6 +60,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (session?.user) {
                     const userProfile = await fetchProfile(session.user.id);
                     setProfile(userProfile);
+
+                    // Process daily login
+                    // Import dynamically to avoid circular dependency
+                    import('@/lib/xp').then(async ({ processDailyLogin }) => {
+                        const result = await processDailyLogin(session.user.id);
+                        if (result.awarded) {
+                            console.log('[Auth] Daily login rewarded:', result);
+                            // Refresh profile to show new XP
+                            const updated = await fetchProfile(session.user.id);
+                            setProfile(updated);
+                        }
+                    });
                 }
             } catch (error) {
                 console.error('Auth initialization error:', error);
@@ -79,6 +91,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (session?.user) {
                     const userProfile = await fetchProfile(session.user.id);
                     setProfile(userProfile);
+
+                    // Process daily login (same logic as initAuth)
+                    import('@/lib/xp').then(async ({ processDailyLogin }) => {
+                        const result = await processDailyLogin(session.user.id);
+                        if (result.awarded) {
+                            console.log('[Auth] Daily login rewarded:', result);
+                            const updated = await fetchProfile(session.user.id);
+                            setProfile(updated);
+                        }
+                    });
                 } else {
                     setProfile(null);
                 }

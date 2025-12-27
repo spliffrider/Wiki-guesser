@@ -116,9 +116,13 @@ export function useUGC() {
 
             if (count) {
                 // Import dynamically to avoid circular dependency
-                const { checkCreatorAchievements } = await import('@/lib/achievements');
-                await checkCreatorAchievements(user.id, count);
+                const { checkCreationAchievements } = await import('@/lib/achievements');
+                await checkCreationAchievements(user.id);
             }
+
+            // Award XP for submission
+            const { awardXP, XP_REWARDS } = await import('@/lib/xp');
+            await awardXP(user.id, XP_REWARDS.QUESTION_SUBMIT, 'Question submitted');
 
             return { data, error: null };
         } catch (err: unknown) {

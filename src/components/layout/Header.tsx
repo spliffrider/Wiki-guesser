@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme, THEME_OPTIONS, Theme } from '@/hooks/useTheme';
+import { calculateLevel, getLevelBadge } from '@/lib/levels';
 import { getAvatarEmoji } from '@/lib/avatars';
 import { RewardStar } from './RewardStar';
 import styles from './Header.module.css';
@@ -19,6 +20,10 @@ export function Header() {
     // Refs for click-outside detection
     const themeDropdownRef = useRef<HTMLDivElement>(null);
     const userDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Calculate level
+    const level = calculateLevel(profile?.total_score || 0);
+    const levelBadge = getLevelBadge(level);
 
     // Close dropdowns when clicking outside
     useEffect(() => {
@@ -101,12 +106,16 @@ export function Header() {
                                     <span className={styles.loggedInIndicator}></span>
                                 </span>
                                 <span className={styles.username}>
-                                    {profile?.username || 'User'}
+                                    <span title={`Level ${level}`}>{levelBadge}</span> {profile?.username || 'User'}
                                 </span>
                             </button>
 
                             {showDropdown && (
                                 <div className={styles.dropdown}>
+                                    <div className={styles.dropdownLevel}>
+                                        <span>Level {level}</span>
+                                        <span className={styles.dropdownBadge}>{levelBadge}</span>
+                                    </div>
                                     <Link
                                         href="/profile"
                                         className={styles.dropdownItem}
@@ -129,8 +138,9 @@ export function Header() {
                                         🏆 Leaderboard
                                     </Link>
                                     <div className={styles.dropdownStats}>
-                                        <span>🏆 {profile?.total_score?.toLocaleString() || 0}</span>
                                         <span>🎮 {profile?.games_played || 0} games</span>
+                                        <span>🔥 {profile?.longest_streak || 0} streak</span>
+                                        <span>⚡ {profile?.total_score?.toLocaleString() || 0} XP</span>
                                     </div>
                                     <button
                                         onClick={handleSignOut}

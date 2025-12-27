@@ -32,8 +32,8 @@ export default function ProfilePage() {
                 setGames(data);
                 setLoadingGames(false);
             });
-            getUserAchievements(user.id).then(data => {
-                setAchievements(data);
+            getUserAchievements(user.id).then(result => {
+                setAchievements(result.unlocked);
             });
         }
     }, [user]);
@@ -54,7 +54,7 @@ export default function ProfilePage() {
         ? Math.round((profile.correct_answers / (profile.games_played * 5)) * 100)
         : 0;
 
-    const unlockedIds = new Set(achievements.map(a => a.achievement_id));
+    const unlockedIds = new Set(achievements.map(a => a.id));
 
     // Level calculations (XP = total_score)
     const xp = profile.total_score;
