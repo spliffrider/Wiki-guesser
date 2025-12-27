@@ -59,18 +59,25 @@ export function useTheme() {
         setTheme(initialTheme);
         applyTheme(initialTheme);
         setMounted(true);
+    }, [applyTheme]); // Removed 'theme' from dependencies - only run once on mount
 
-        // Listen for system preference changes
+    // Listen for system preference changes (separate effect)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !mounted) return;
+
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const handleChange = () => {
-            if (theme === 'system') {
+            // Only update if using system theme
+            const currentTheme = localStorage.getItem('wiki-guesser-theme') as Theme | null;
+            if (currentTheme === 'system' || !currentTheme) {
                 setIsDark(mediaQuery.matches);
+                applyTheme('system');
             }
         };
 
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
-    }, [applyTheme, theme]);
+    }, [mounted, applyTheme]);
 
     const setThemeValue = useCallback((newTheme: Theme) => {
         setTheme(newTheme);

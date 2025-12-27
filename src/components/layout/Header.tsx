@@ -3,7 +3,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme, THEME_OPTIONS, Theme } from '@/hooks/useTheme';
 import { getAvatarEmoji } from '@/lib/avatars';
@@ -15,6 +15,25 @@ export function Header() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showThemeDropdown, setShowThemeDropdown] = useState(false);
     const { theme, setTheme, isDark, mounted } = useTheme();
+
+    // Refs for click-outside detection
+    const themeDropdownRef = useRef<HTMLDivElement>(null);
+    const userDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target as Node)) {
+                setShowThemeDropdown(false);
+            }
+            if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleSignOut = async () => {
         await signOut();
@@ -40,7 +59,7 @@ export function Header() {
                     {user && <RewardStar />}
 
                     {/* Theme selector */}
-                    <div className={styles.themeSelector}>
+                    <div className={styles.themeSelector} ref={themeDropdownRef}>
                         <button
                             onClick={() => setShowThemeDropdown(!showThemeDropdown)}
                             className={styles.themeToggle}
@@ -70,7 +89,7 @@ export function Header() {
                             <div className={styles.spinner}></div>
                         </div>
                     ) : user ? (
-                        <div className={styles.userMenu}>
+                        <div className={styles.userMenu} ref={userDropdownRef}>
                             <button
                                 className={styles.userButton}
                                 onClick={() => setShowDropdown(!showDropdown)}
