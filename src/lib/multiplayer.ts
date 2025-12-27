@@ -120,7 +120,8 @@ export async function createRoom(hostId: string, hostUsername: string): Promise<
             }
 
             // Add host as player with timeout
-            const { error: playerError } = await withTimeout(
+            // IMPORTANT: .select() is needed to verify INSERT succeeded - RLS with_check failures are silent!
+            const { data: playerData, error: playerError } = await withTimeout(
                 supabase
                     .from('room_players')
                     .insert({
@@ -129,19 +130,21 @@ export async function createRoom(hostId: string, hostUsername: string): Promise<
                         username: hostUsername,
                         is_host: true,
                         is_ready: true,
-                    }),
+                    })
+                    .select()
+                    .single(),
                 QUERY_TIMEOUT_MS,
                 'Adding host to room timed out'
             );
 
-            if (playerError) {
-                console.error('[multiplayer] Failed to add host to room:', playerError);
+            if (playerError || !playerData) {
+                console.error('[multiplayer] Failed to add host to room:', playerError || 'No data returned');
                 // Cleanup room if player insert fails
                 await supabase.from('game_rooms').delete().eq('id', room.id);
-                return { room: null, error: `Failed to add you to the room: ${playerError.message}` };
+                return { room: null, error: `Failed to add you to the room: ${playerError?.message || 'Insert verification failed'}` };
             }
 
-            console.log('[multiplayer] Room created successfully:', { roomId: room.id, code: room.code, hostId });
+            console.log('[multiplayer] Room created successfully:', { roomId: room.id, code: room.code, hostId, playerId: playerData.id });
 
             return { room: room as GameRoom, error: null };
         } catch (err) {
@@ -213,7 +216,8 @@ export async function joinRoom(
         }
 
         // Join room with timeout
-        const { error: joinError } = await withTimeout(
+        // IMPORTANT: .select() is needed to verify INSERT succeeded - RLS with_check failures are silent!
+        const { data: playerData, error: joinError } = await withTimeout(
             supabase
                 .from('room_players')
                 .insert({
@@ -221,17 +225,19 @@ export async function joinRoom(
                     user_id: userId,
                     username,
                     is_host: false,
-                }),
+                })
+                .select()
+                .single(),
             QUERY_TIMEOUT_MS,
             'Joining room timed out'
         );
 
-        if (joinError) {
-            console.error('[multiplayer] Failed to join room:', joinError);
-            return { room: null, error: `Failed to join room: ${joinError.message}` };
+        if (joinError || !playerData) {
+            console.error('[multiplayer] Failed to join room:', joinError || 'No data returned');
+            return { room: null, error: `Failed to join room: ${joinError?.message || 'Insert verification failed'}` };
         }
 
-        console.log('[multiplayer] Player joined room:', { roomId: room.id, code: room.code, userId });
+        console.log('[multiplayer] Player joined room:', { roomId: room.id, code: room.code, userId, playerId: playerData.id });
         return { room: room as GameRoom, error: null };
     } catch (err) {
         return { room: null, error: err instanceof Error ? err.message : 'Failed to join room' };
