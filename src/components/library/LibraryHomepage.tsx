@@ -128,12 +128,12 @@ export function LibraryHomepage() {
                 </div>
 
                 {/* Bookshelf */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 py-8 wood-shelf bg-[#281417] rounded-t-lg border-x border-x-[#3e2723] shadow-inner">
+                <div className="bookshelf-grid wood-shelf" style={{ backgroundColor: '#281417', borderRadius: '0.5rem 0.5rem 0 0', borderLeft: '1px solid #3e2723', borderRight: '1px solid #3e2723' }}>
                     {GAME_MODES.map((mode, index) => (
                         <Link
                             key={mode.id}
                             href={mode.href}
-                            className={`group relative aspect-[3/4] rounded-r-lg rounded-l-sm ${mode.gradient} book-spine-effect book-hover cursor-pointer shadow-book overflow-hidden`}
+                            className={`book-card book-spine-effect ${mode.gradient}`}
                         >
                             {/* Spine crease */}
                             <div className="absolute inset-y-0 left-0 w-8 bg-black/20 border-r border-white/10" />

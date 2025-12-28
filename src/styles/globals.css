@@ -1,12 +1,13 @@
 /* Wiki Guesser - Global Styles */
 
+/* CSS Imports MUST come first */
+@import './variables.css';
+@import './library.css';
+
 /* Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './variables.css';
-@import './library.css';
 
 /* ============================================
    CSS RESET & BASE

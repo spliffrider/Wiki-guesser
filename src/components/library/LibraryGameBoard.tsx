@@ -65,14 +65,15 @@ export function LibraryGameBoard({
                             <div className="absolute top-0 left-8 right-8 h-8 border-b border-[#d6cbb5]" />
 
                             {/* Header */}
-                            <div className="relative flex justify-between items-baseline mb-6 border-b-2 border-[#2b1d1f] pb-2">
-                                <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-[#8d6e63]">
-                                    Excerpt #{Math.floor(Math.random() * 9000 + 1000)}-{String.fromCharCode(65 + currentRound)}
+                            <div className="relative flex justify-between items-baseline mb-6 pb-2">
+                                <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-[#5d4037]">
+                                    Excerpt #{8291 + currentRound}-{String.fromCharCode(65 + currentRound)}
                                 </h2>
                                 <span className="font-serif italic text-[#8d6e63]">
-                                    {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Mode
+                                    Page {142 + currentRound}
                                 </span>
                             </div>
+                            <div className="w-full h-px bg-[#5d4037] mb-6" />
 
                             {/* Article Excerpt */}
                             <div className="relative font-display text-lg md:text-xl leading-relaxed space-y-6 flex-grow overflow-y-auto pr-2">
@@ -132,36 +133,48 @@ export function LibraryGameBoard({
                     {/* Right Column: Timer, Score, Answers */}
                     <div className="lg:col-span-5 flex flex-col gap-6">
                         {/* Timer and Stats */}
-                        <div className="flex items-center gap-4 bg-[#221013] border border-[#3e2723] p-4 rounded-lg shadow-inner">
+                        <div className="flex items-center gap-4 bg-[#221013] border border-[#3e2723] p-4 rounded-lg">
                             {/* Circular Timer */}
-                            <div className="relative size-20 shrink-0">
-                                <div className="absolute inset-0 rounded-full border-4 border-[#3e2723]" />
-                                <div
-                                    className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent"
-                                    style={{
-                                        transform: `rotate(${(1 - timeRemaining / config.timeLimit) * 360}deg)`,
-                                        transition: 'transform 1s linear'
-                                    }}
-                                />
-                                <div className="absolute inset-2 bg-[#2a1619] rounded-full flex items-center justify-center flex-col shadow-inner">
-                                    <span className="material-symbols-outlined text-amber-500 text-sm">hourglass_top</span>
-                                    <span className="text-white font-bold text-lg leading-none">{timeRemaining}</span>
+                            <div className="relative w-16 h-16 shrink-0">
+                                <svg className="w-16 h-16 transform -rotate-90">
+                                    <circle
+                                        cx="32"
+                                        cy="32"
+                                        r="28"
+                                        stroke="#3e2723"
+                                        strokeWidth="4"
+                                        fill="transparent"
+                                    />
+                                    <circle
+                                        cx="32"
+                                        cy="32"
+                                        r="28"
+                                        stroke="#d41132"
+                                        strokeWidth="4"
+                                        fill="transparent"
+                                        strokeDasharray={`${(timeRemaining / config.timeLimit) * 175.9} 175.9`}
+                                        strokeLinecap="round"
+                                        className="transition-all duration-1000"
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-white font-bold text-2xl">{timeRemaining}</span>
                                 </div>
                             </div>
 
                             {/* Stats */}
-                            <div className="flex flex-col gap-1 w-full">
-                                <div className="flex justify-between items-center border-b border-[#3e2723] pb-1 mb-1">
+                            <div className="flex flex-col gap-2 w-full">
+                                <div className="flex justify-between items-center">
                                     <span className="text-slate-400 text-xs uppercase tracking-wider font-bold">Current Score</span>
-                                    <span className="text-amber-400 font-mono font-bold">{score.toLocaleString()}</span>
+                                    <span className="text-primary font-mono font-bold text-lg">{score.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-slate-400 text-xs uppercase tracking-wider font-bold">Streak</span>
-                                    <div className="flex gap-0.5">
+                                    <div className="flex gap-1">
                                         {streakDots.map((active, i) => (
                                             <span
                                                 key={i}
-                                                className={`size-2 rounded-full ${active ? 'bg-green-500' : 'bg-[#3e2723]'}`}
+                                                className={`w-2.5 h-2.5 rounded-full ${active ? 'bg-green-500' : 'bg-[#3e2723]'}`}
                                             />
                                         ))}
                                     </div>
@@ -183,7 +196,7 @@ export function LibraryGameBoard({
                                     onClick={() => onSubmitGuess(option)}
                                     className="group relative w-full text-left bg-[#fcfbf9] hover:bg-white p-1 rounded shadow-card transition-all hover:-translate-y-1 active:translate-y-0.5"
                                 >
-                                    <div className="border border-[#e0e0e0] border-l-4 border-l-[#8d6e63] group-hover:border-l-primary rounded-sm p-4 h-full flex items-center justify-between">
+                                    <div className="border border-[#e0e0e0] border-l-4 border-l-amber-600 group-hover:border-l-primary rounded-sm p-4 h-full flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] text-slate-400 font-sans uppercase tracking-widest mb-1">
                                                 Option {String.fromCharCode(65 + index)}
@@ -237,6 +250,6 @@ export function LibraryGameBoard({
                     />
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -88,3 +88,139 @@ html.dark-library::-webkit-scrollbar-thumb:hover {
 .book-purple {
     background: linear-gradient(90deg, #4a044e 0%, #a21caf 10%, #7e22ce 100%);
 }
+
+/* ============================================
+   BOOKSHELF LAYOUT CLASSES
+   ============================================ */
+
+/* Bookshelf grid container */
+.bookshelf-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+}
+
+@media (min-width: 640px) {
+    .bookshelf-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .bookshelf-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Book card styling */
+.book-card {
+    position: relative;
+    height: 320px;
+    border-radius: 0.125rem 0.5rem 0.5rem 0.125rem;
+    cursor: pointer;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+}
+
+.book-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    z-index: 10;
+}
+
+/* Book content wrapper */
+.book-content {
+    position: absolute;
+    top: 2rem;
+    left: 2.5rem;
+    right: 1rem;
+}
+
+/* Book footer */
+.book-footer {
+    position: absolute;
+    bottom: 1rem;
+    left: 2.5rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.book-card:hover .book-footer {
+    opacity: 1;
+}
+
+/* Library page layout */
+.library-page {
+    min-height: 100vh;
+    background-color: #1a0c0e;
+    color: #f8f6f6;
+    font-family: 'Noto Serif', serif;
+}
+
+.library-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+}
+
+/* Library section styling */
+.library-section {
+    background-color: #2a1619;
+    border: 1px solid #482329;
+    border-radius: 1rem;
+    padding: 2rem 3rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Hero background overlay */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #221013, rgba(34, 16, 19, 0.9), transparent);
+    z-index: 1;
+}
+
+/* Primary button */
+.btn-primary {
+    height: 3rem;
+    padding: 0 2rem;
+    border-radius: 0.25rem;
+    background-color: #d41132;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #b00e2a;
+}
+
+/* Secondary button */
+.btn-secondary {
+    height: 3rem;
+    padding: 0 2rem;
+    border-radius: 0.25rem;
+    background-color: transparent;
+    color: #fef3c7;
+    font-weight: 500;
+    border: 1px solid rgba(120, 53, 15, 0.5);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(120, 53, 15, 0.2);
+}
