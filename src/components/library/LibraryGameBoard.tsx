@@ -292,9 +292,9 @@ export function LibraryGameBoard({
                                                 : 'bg-[#fcfbf9] opacity-50'
                                         }`}
                                 >
-                                    <div className={`border rounded-sm p-4 h-full flex items-center justify-between ${option === lastRound?.correctAnswer
+                                    <div className={`border rounded-sm p-4 h-full flex items-center justify-between ${phase === 'between-rounds' && option === lastRound?.correctAnswer
                                         ? 'border-green-500 border-l-4'
-                                        : option === lastRound?.guess && !lastRound?.isCorrect
+                                        : phase === 'between-rounds' && option === lastRound?.guess && !lastRound?.isCorrect
                                             ? 'border-red-500 border-l-4'
                                             : 'border-[#e0e0e0] border-l-4 border-l-amber-600 group-hover:border-l-primary'
                                         }`}>
@@ -307,12 +307,12 @@ export function LibraryGameBoard({
                                             </span>
                                         </div>
                                         {(phase === 'playing' || option === lastRound?.correctAnswer) && (
-                                            <span className={`material-symbols-outlined transition-opacity ${option === lastRound?.correctAnswer ? 'text-green-600 opacity-100' : 'text-primary opacity-0 group-hover:opacity-100'
+                                            <span className={`material-symbols-outlined transition-opacity ${phase === 'between-rounds' && option === lastRound?.correctAnswer ? 'text-green-600 opacity-100' : 'text-primary opacity-0 group-hover:opacity-100'
                                                 }`}>
                                                 check_circle
                                             </span>
                                         )}
-                                        {phase !== 'playing' && option === lastRound?.guess && !lastRound?.isCorrect && (
+                                        {phase === 'between-rounds' && option === lastRound?.guess && !lastRound?.isCorrect && (
                                             <span className="material-symbols-outlined text-red-600">
                                                 cancel
                                             </span>

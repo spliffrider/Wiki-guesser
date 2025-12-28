@@ -88,7 +88,8 @@ export default function DailyChallengePage() {
             isCorrect: state.rounds[state.currentRound].isCorrect ?? false,
             guess: state.rounds[state.currentRound].guess,
             pointsEarned: state.rounds[state.currentRound].pointsEarned,
-            correctAnswer: state.rounds[state.currentRound].correctAnswer,
+            // SECURITY: Only pass correct answer during between-rounds phase to prevent cheating
+            correctAnswer: state.phase === 'between-rounds' ? state.rounds[state.currentRound].correctAnswer : '',
         }
         : null;
 
