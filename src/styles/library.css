@@ -1,0 +1,90 @@
+/* Wiki Guesser - Library Theme Styles */
+/* Custom styling for the library/bookshelf theme from Stitch */
+
+/* Book spine effect - realistic 3D book appearance */
+.book-spine-effect {
+    box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.4),
+        inset -2px 0 5px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Book hover lift effect */
+.book-hover:hover {
+    transform: translateY(-10px) scale(1.02);
+    z-index: 10;
+}
+
+/* Wood shelf styling with grain texture */
+.wood-shelf {
+    border-bottom: 12px solid #3e2723;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+    position: relative;
+}
+
+.wood-shelf::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: repeating-linear-gradient(45deg,
+            #3e2723,
+            #3e2723 10px,
+            #2d1b18 10px,
+            #2d1b18 20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Library theme scrollbar */
+html.dark-library::-webkit-scrollbar {
+    width: 10px;
+}
+
+html.dark-library::-webkit-scrollbar-track {
+    background: #221013;
+}
+
+html.dark-library::-webkit-scrollbar-thumb {
+    background: #5d4037;
+    border-radius: 5px;
+}
+
+html.dark-library::-webkit-scrollbar-thumb:hover {
+    background: #d41132;
+}
+
+/* Material Symbols for library theme */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Leather texture overlay (for book covers) */
+.leather-texture {
+    background-image: url('https://www.transparenttextures.com/patterns/leather.png');
+    opacity: 0.2;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+}
+
+/* Gold glow for highlights */
+.glow-gold {
+    box-shadow: 0 0 20px rgba(255, 200, 100, 0.1);
+}
+
+/* Book gradient presets */
+.book-red {
+    background: linear-gradient(90deg, #881e1e 0%, #d41132 10%, #a00e26 100%);
+}
+
+.book-blue {
+    background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 10%, #1d4ed8 100%);
+}
+
+.book-green {
+    background: linear-gradient(90deg, #3f6212 0%, #65a30d 10%, #4d7c0f 100%);
+}
+
+.book-purple {
+    background: linear-gradient(90deg, #4a044e 0%, #a21caf 10%, #7e22ce 100%);
+}

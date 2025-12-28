@@ -256,7 +256,40 @@ html.dark {
     --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Auto dark mode via system preference (defaults to Charcoal) */
+/* Theme 4: Library (Stitch-generated - Red & Dark Wood) */
+html.dark-library {
+    --color-bg-primary: #221013;
+    --color-bg-secondary: #1a0c0e;
+    --color-bg-tertiary: #2a1619;
+    --color-bg-highlight: #33181d;
+
+    --color-text-primary: #f8f6f6;
+    --color-text-secondary: #e8e4d9;
+    --color-text-muted: #c9929b;
+    --color-text-inverse: #221013;
+
+    --color-primary: #d41132;
+    --color-primary-hover: #b00e2a;
+    --color-primary-light: rgba(212, 17, 50, 0.2);
+
+    --color-success-bg: rgba(46, 125, 50, 0.25);
+    --color-error-bg: rgba(198, 40, 40, 0.25);
+    --color-warning-bg: rgba(245, 124, 0, 0.25);
+
+    --color-gold: #ffb300;
+    --color-gold-glow: rgba(255, 179, 0, 0.5);
+
+    --color-border: #482329;
+    --color-border-light: #67323b;
+    --color-border-subtle: #33181d;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Auto dark mode via system preference (defaults to Library) */
 @media (prefers-color-scheme: dark) {
     html:not(.light):not(.dark-forest):not(.dark-navy):not(.dark-charcoal) {
         --color-bg-primary: #1C1C1E;

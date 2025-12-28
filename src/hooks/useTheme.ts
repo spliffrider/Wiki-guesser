@@ -4,14 +4,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export type DarkTheme = 'dark-forest' | 'dark-navy' | 'dark-charcoal';
+export type DarkTheme = 'dark-forest' | 'dark-navy' | 'dark-charcoal' | 'dark-library';
 export type Theme = 'light' | DarkTheme | 'system';
 
-const DARK_THEMES: DarkTheme[] = ['dark-forest', 'dark-navy', 'dark-charcoal'];
+const DARK_THEMES: DarkTheme[] = ['dark-library', 'dark-forest', 'dark-navy', 'dark-charcoal'];
 const ALL_THEME_CLASSES = ['light', 'dark', ...DARK_THEMES];
 
 export const THEME_OPTIONS: { value: Theme; label: string; icon: string }[] = [
     { value: 'light', label: 'Light', icon: '☀️' },
+    { value: 'dark-library', label: 'Library', icon: '📚' },
     { value: 'dark-charcoal', label: 'Charcoal', icon: '🌑' },
     { value: 'dark-navy', label: 'Navy', icon: '🌊' },
     { value: 'dark-forest', label: 'Forest', icon: '🌲' },
@@ -90,9 +91,9 @@ export function useTheme() {
         if (isDark) {
             setThemeValue('light');
         } else {
-            // If coming from light, use the last dark theme or default to charcoal
+            // If coming from light, use the last dark theme or default to library
             const lastDark = localStorage.getItem('wiki-guesser-last-dark') as DarkTheme | null;
-            setThemeValue(lastDark || 'dark-charcoal');
+            setThemeValue(lastDark || 'dark-library');
         }
     }, [isDark, setThemeValue]);
 
