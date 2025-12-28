@@ -57,7 +57,7 @@ interface UseGameReturn {
     state: GameState;
     isLoading: boolean;
     error: string | null;
-    startGame: (difficulty: Difficulty, userLevel?: number) => Promise<void>;
+    startGame: (difficulty: Difficulty, userLevel?: number, seed?: string) => Promise<void>;
     submitGuess: (guess: string) => void;
     nextRound: () => void;
     resetGame: () => void;
@@ -148,7 +148,7 @@ export function useGame(): UseGameReturn {
         setLastScoreBreakdown(null);
     }, []);
 
-    const startGame = useCallback(async (difficulty: Difficulty, userLevel?: number) => {
+    const startGame = useCallback(async (difficulty: Difficulty, userLevel?: number, seed?: string) => {
         setIsLoading(true);
         setError(null);
 
@@ -156,7 +156,7 @@ export function useGame(): UseGameReturn {
             // Generate a random category for each round
             const roundCategories: QuestionCategory[] = [];
             for (let i = 0; i < DEFAULT_TOTAL_ROUNDS; i++) {
-                roundCategories.push(getRandomCategory());
+                roundCategories.push(getRandomCategory(seed ? `${seed}_${i}` : undefined));
             }
 
             // Count how many of each category we need
@@ -168,11 +168,11 @@ export function useGame(): UseGameReturn {
 
             // Fetch all questions from Supabase in parallel (fast!)
             const [wikiWhatRoundData, oddWikiOutQuestions, whenInWikiQuestions, wikiOrFictionQuestions, wikiLinksQuestions] = await Promise.all([
-                getRandomWikiWhat(wikiWhatCount),
-                getRandomOddWikiOut(oddWikiOutCount),
-                getRandomWhenInWiki(whenInWikiCount),
-                getRandomWikiOrFiction(wikiOrFictionCount),
-                getRandomWikiLinks(wikiLinksCount),
+                getRandomWikiWhat(wikiWhatCount, seed ? `${seed}_wiki_what` : undefined),
+                getRandomOddWikiOut(oddWikiOutCount, seed ? `${seed}_odd_wiki_out` : undefined),
+                getRandomWhenInWiki(whenInWikiCount, seed ? `${seed}_when_in_wiki` : undefined),
+                getRandomWikiOrFiction(wikiOrFictionCount, seed ? `${seed}_wiki_or_fiction` : undefined),
+                getRandomWikiLinks(wikiLinksCount, seed ? `${seed}_wiki_links` : undefined),
             ]);
 
             // If wiki_what has no data, replace those rounds with wiki_or_fiction
@@ -181,7 +181,7 @@ export function useGame(): UseGameReturn {
             if (wikiWhatRoundData.length === 0 && wikiWhatCount > 0) {
                 console.log('[useGame] No wiki_what questions available, substituting with wiki_or_fiction');
                 // Fetch additional wiki_or_fiction questions to replace wiki_what rounds
-                const additionalWikiOrFiction = await getRandomWikiOrFiction(wikiWhatCount);
+                const additionalWikiOrFiction = await getRandomWikiOrFiction(wikiWhatCount, seed ? `${seed}_fallback` : undefined);
                 wikiOrFictionQuestions.push(...additionalWikiOrFiction);
 
                 // Replace wiki_what with wiki_or_fiction in the categories

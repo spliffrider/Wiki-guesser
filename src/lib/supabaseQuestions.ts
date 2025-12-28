@@ -2,6 +2,7 @@
 // Fetches curated questions from Supabase tables
 
 import { getSupabaseClient, supabaseFetch } from './supabase';
+import { seededShuffle } from './random';
 import {
     OddWikiOutData,
     WhenInWikiData,
@@ -114,9 +115,10 @@ const QUERY_TIMEOUT_MS = 15000; // 15 second timeout
  * Fetch random "Odd Wiki Out" questions from Supabase.
  * Falls back to empty array on error.
  * @param count Number of questions to fetch
+ * @param seed Optional seed string for deterministic shuffling
  * @returns Array of OddWikiOutData
  */
-export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiOutData[]> {
+export async function getRandomOddWikiOutFromDB(count: number, seed?: string): Promise<OddWikiOutData[]> {
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<OddWikiOutData[]> => {
@@ -157,6 +159,9 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
 
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
+        if (seed) {
+            return seededShuffle(combined, seed).slice(0, count);
+        }
         return shuffleArray(combined).slice(0, count);
     };
 
@@ -172,9 +177,10 @@ export async function getRandomOddWikiOutFromDB(count: number): Promise<OddWikiO
  * Fetch random "When In Wiki" questions from Supabase.
  * Falls back to empty array on error.
  * @param count Number of questions to fetch
+ * @param seed Optional seed string for deterministic shuffling
  * @returns Array of WhenInWikiData
  */
-export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWikiData[]> {
+export async function getRandomWhenInWikiFromDB(count: number, seed?: string): Promise<WhenInWikiData[]> {
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<WhenInWikiData[]> => {
@@ -212,6 +218,9 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
 
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
+        if (seed) {
+            return seededShuffle(combined, seed).slice(0, count);
+        }
         return shuffleArray(combined).slice(0, count);
     };
 
@@ -227,9 +236,10 @@ export async function getRandomWhenInWikiFromDB(count: number): Promise<WhenInWi
  * Fetch random "Wiki Or Fiction" questions from Supabase.
  * Falls back to empty array on error.
  * @param count Number of questions to fetch
+ * @param seed Optional seed string for deterministic shuffling
  * @returns Array of WikiOrFictionData
  */
-export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiOrFictionData[]> {
+export async function getRandomWikiOrFictionFromDB(count: number, seed?: string): Promise<WikiOrFictionData[]> {
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<WikiOrFictionData[]> => {
@@ -267,6 +277,9 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
 
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
+        if (seed) {
+            return seededShuffle(combined, seed).slice(0, count);
+        }
         return shuffleArray(combined).slice(0, count);
     };
 
@@ -282,9 +295,10 @@ export async function getRandomWikiOrFictionFromDB(count: number): Promise<WikiO
  * Fetch random "Wiki Links" questions from Supabase.
  * Falls back to empty array on error.
  * @param count Number of questions to fetch
+ * @param seed Optional seed string for deterministic shuffling
  * @returns Array of WikiLinksData
  */
-export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinksData[]> {
+export async function getRandomWikiLinksFromDB(count: number, seed?: string): Promise<WikiLinksData[]> {
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<WikiLinksData[]> => {
@@ -322,6 +336,9 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
 
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
+        if (seed) {
+            return seededShuffle(combined, seed).slice(0, count);
+        }
         return shuffleArray(combined).slice(0, count);
     };
 
@@ -338,9 +355,10 @@ export async function getRandomWikiLinksFromDB(count: number): Promise<WikiLinks
  * Returns WikiTopic objects with pre-defined wrong options.
  * Falls back to empty array on error.
  * @param count Number of questions to fetch
+ * @param seed Optional seed string for deterministic shuffling
  * @returns Array of { topic: WikiTopic, wrongOptions: string[] }
  */
-export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
+export async function getRandomWikiWhatFromDB(count: number, seed?: string): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
     if (typeof window === 'undefined') return [];
 
     const fetchQuestions = async (): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> => {
@@ -386,6 +404,9 @@ export async function getRandomWikiWhatFromDB(count: number): Promise<Array<{ to
 
         // 4. Shuffle combined pool
         const combined = [...mainMapped, ...ugcMapped];
+        if (seed) {
+            return seededShuffle(combined, seed).slice(0, count);
+        }
         return shuffleArray(combined).slice(0, count);
     };
 

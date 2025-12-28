@@ -15,6 +15,8 @@ interface LibraryGameResultProps {
     accuracy?: number;
     onPlayAgain: () => void;
     onHome: () => void;
+    title?: string;
+    subtitle?: string;
 }
 
 export function LibraryGameResult({
@@ -27,6 +29,8 @@ export function LibraryGameResult({
     accuracy = 0,
     onPlayAgain,
     onHome,
+    title = "Archivist's Report",
+    subtitle,
 }: LibraryGameResultProps) {
     const handleShare = async () => {
         const shareText = `🎮 I scored ${score.toLocaleString()} points in Wiki Guesser!\n🔥 ${longestStreak} streak | ${difficulty} difficulty\n\nCan you beat my score? Play at:`;
@@ -59,18 +63,14 @@ export function LibraryGameResult({
                     <div className="flex flex-wrap items-center justify-center md:justify-between gap-4">
                         <div>
                             <p className="text-primary font-bold uppercase tracking-widest text-xs mb-1">
-                                Session Complete
+                                {subtitle || `Session #${8291 + Math.floor(Math.random() * 100)}`}
                             </p>
                             <h2 className="text-3xl md:text-4xl font-black text-[#eaddcf]">
-                                Archivist&apos;s Report
+                                {title}
                             </h2>
                         </div>
-                        {/* Status Stamp */}
-                        <div className="border-4 border-primary/40 text-primary px-4 py-2 rounded-lg transform -rotate-2 backdrop-blur-sm bg-primary/5">
-                            <span className="font-black text-lg md:text-xl tracking-widest">
-                                STATUS: VERIFIED
-                            </span>
-                        </div>
+                        {/* Status Stamp - Empty outline like Stitch reference */}
+                        <div className="w-36 h-12 border-2 border-primary/60 rounded" />
                     </div>
                 </div>
 
@@ -141,9 +141,9 @@ export function LibraryGameResult({
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-[#ebe0d3] p-4 rounded border border-[#d4c5b5] flex flex-col items-center text-center shadow-sm">
                                     <span className="material-symbols-outlined text-[#8c7b70] mb-1">workspace_premium</span>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[#8c7b70]">Final Score</span>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-[#8c7b70]">Score Added</span>
                                     <span className="text-3xl font-black text-primary font-sans mt-1">
-                                        {score.toLocaleString()}
+                                        +{score.toLocaleString()}
                                     </span>
                                 </div>
                                 <div className="bg-[#ebe0d3] p-4 rounded border border-[#d4c5b5] flex flex-col items-center text-center shadow-sm">

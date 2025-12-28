@@ -12,6 +12,7 @@ import {
     QuestionCategory,
     WikiTopic,
 } from '@/types';
+import { seededShuffle } from './random';
 import {
     getRandomOddWikiOutFromDB,
     getRandomWhenInWikiFromDB,
@@ -37,10 +38,11 @@ function shuffleArray<T>(array: T[]): T[] {
 /**
  * Get random "Odd Wiki Out" questions.
  * Tries Supabase first, falls back to static JSON if empty/error.
+ * @param seed Optional seed string for deterministic shuffling
  */
-export async function getRandomOddWikiOut(count: number = 1): Promise<OddWikiOutData[]> {
+export async function getRandomOddWikiOut(count: number = 1, seed?: string): Promise<OddWikiOutData[]> {
     // Try Supabase first
-    const dbQuestions = await getRandomOddWikiOutFromDB(count);
+    const dbQuestions = await getRandomOddWikiOutFromDB(count, seed);
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
@@ -49,6 +51,9 @@ export async function getRandomOddWikiOut(count: number = 1): Promise<OddWikiOut
 
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for odd_wiki_out');
+    if (seed) {
+        return seededShuffle(oddWikiOutData.questions as OddWikiOutData[], seed).slice(0, Math.min(count, oddWikiOutData.questions.length));
+    }
     const shuffled = shuffleArray(oddWikiOutData.questions as OddWikiOutData[]);
     return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -56,10 +61,11 @@ export async function getRandomOddWikiOut(count: number = 1): Promise<OddWikiOut
 /**
  * Get random "When In Wiki" questions.
  * Tries Supabase first, falls back to static JSON if empty/error.
+ * @param seed Optional seed for deterministic shuffling
  */
-export async function getRandomWhenInWiki(count: number = 1): Promise<WhenInWikiData[]> {
+export async function getRandomWhenInWiki(count: number = 1, seed?: string): Promise<WhenInWikiData[]> {
     // Try Supabase first
-    const dbQuestions = await getRandomWhenInWikiFromDB(count);
+    const dbQuestions = await getRandomWhenInWikiFromDB(count, seed);
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
@@ -68,6 +74,9 @@ export async function getRandomWhenInWiki(count: number = 1): Promise<WhenInWiki
 
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for when_in_wiki');
+    if (seed) {
+        return seededShuffle(whenInWikiData.questions as WhenInWikiData[], seed).slice(0, Math.min(count, whenInWikiData.questions.length));
+    }
     const shuffled = shuffleArray(whenInWikiData.questions as WhenInWikiData[]);
     return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -75,10 +84,11 @@ export async function getRandomWhenInWiki(count: number = 1): Promise<WhenInWiki
 /**
  * Get random "Wiki Or Fiction" questions.
  * Tries Supabase first, falls back to static JSON if empty/error.
+ * @param seed Optional seed for deterministic shuffling
  */
-export async function getRandomWikiOrFiction(count: number = 1): Promise<WikiOrFictionData[]> {
+export async function getRandomWikiOrFiction(count: number = 1, seed?: string): Promise<WikiOrFictionData[]> {
     // Try Supabase first
-    const dbQuestions = await getRandomWikiOrFictionFromDB(count);
+    const dbQuestions = await getRandomWikiOrFictionFromDB(count, seed);
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
@@ -87,6 +97,9 @@ export async function getRandomWikiOrFiction(count: number = 1): Promise<WikiOrF
 
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for wiki_or_fiction');
+    if (seed) {
+        return seededShuffle(wikiOrFictionData.questions as WikiOrFictionData[], seed).slice(0, Math.min(count, wikiOrFictionData.questions.length));
+    }
     const shuffled = shuffleArray(wikiOrFictionData.questions as WikiOrFictionData[]);
     return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -94,10 +107,11 @@ export async function getRandomWikiOrFiction(count: number = 1): Promise<WikiOrF
 /**
  * Get random "Wiki Links" questions.
  * Tries Supabase first, falls back to static JSON if empty/error.
+ * @param seed Optional seed for deterministic shuffling
  */
-export async function getRandomWikiLinks(count: number = 1): Promise<WikiLinksData[]> {
+export async function getRandomWikiLinks(count: number = 1, seed?: string): Promise<WikiLinksData[]> {
     // Try Supabase first
-    const dbQuestions = await getRandomWikiLinksFromDB(count);
+    const dbQuestions = await getRandomWikiLinksFromDB(count, seed);
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
@@ -106,6 +120,9 @@ export async function getRandomWikiLinks(count: number = 1): Promise<WikiLinksDa
 
     // Fallback to JSON
     console.log('[questions] Falling back to JSON for wiki_links');
+    if (seed) {
+        return seededShuffle(wikiLinksData.questions as WikiLinksData[], seed).slice(0, Math.min(count, wikiLinksData.questions.length));
+    }
     const shuffled = shuffleArray(wikiLinksData.questions as WikiLinksData[]);
     return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -114,9 +131,10 @@ export async function getRandomWikiLinks(count: number = 1): Promise<WikiLinksDa
  * Get random "Wiki What" questions.
  * Fetches pre-curated Wikipedia articles from Supabase.
  * Returns empty array if no data (no JSON fallback for this category).
+ * @param seed Optional seed for deterministic shuffling
  */
-export async function getRandomWikiWhat(count: number = 1): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
-    const dbQuestions = await getRandomWikiWhatFromDB(count);
+export async function getRandomWikiWhat(count: number = 1, seed?: string): Promise<Array<{ topic: WikiTopic; wrongOptions: string[] }>> {
+    const dbQuestions = await getRandomWikiWhatFromDB(count, seed);
     if (dbQuestions.length > 0) {
         return dbQuestions;
     }
@@ -160,8 +178,9 @@ export function getRandomWikiLinksSync(count: number = 1): WikiLinksData[] {
 
 /**
  * Get a random category for variety in gameplay
+ * @param seed Optional seed for deterministic selection
  */
-export function getRandomCategory(): QuestionCategory {
+export function getRandomCategory(seed?: string): QuestionCategory {
     // All categories now use fast Supabase queries (no live Wikipedia API calls)
     const categories: QuestionCategory[] = [
         'wiki_what',
@@ -170,6 +189,9 @@ export function getRandomCategory(): QuestionCategory {
         'wiki_or_fiction',
         'wiki_links',
     ];
+    if (seed) {
+        return seededShuffle(categories, seed)[0];
+    }
     return categories[Math.floor(Math.random() * categories.length)];
 }
 
