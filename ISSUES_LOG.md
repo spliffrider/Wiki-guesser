@@ -43,6 +43,36 @@ A persistent record of bugs, issues, and their solutions. **Check this first whe
 
 <!-- New issues should be added at the top, newest first -->
 
+### 2025-12-31 - wiki-guesser - CRITICAL: RLS Privilege Escalation Vulnerability
+
+**Symptoms:**
+- User "mra" in Discord reported they could give themselves admin, modify app config, and give themselves 2 billion points
+- Attacker "stinky engineer" exploited this to set `is_admin=true` and `total_score=2147483647`
+
+**Root Cause:**
+- RLS policies existed but only checked `auth.uid() = id` for ownership
+- Policies did NOT restrict WHICH COLUMNS users could update
+- Users could update protected fields like `is_admin`, `total_score`, `xp`, etc.
+
+**Solution (3 migrations applied):**
+1. **profiles table**: New policy `Users can update own profile safely` - uses WITH CHECK to prevent changing protected columns (is_admin, total_score, games_played, correct_answers, longest_streak, xp, reward_points)
+2. **user_submitted_questions table**: New policy `Users can update own pending questions safely` - prevents users from changing question `status` field
+3. **agent_mission_logs table**: Enabled RLS (was the only table without it)
+4. Revoked attacker's admin and reset their stats to 0
+
+**What Didn't Work:**
+- N/A - identified and fixed immediately after exploit report
+
+**Related:**
+- This is a common Supabase pitfall - RLS checks ownership but not column access
+- Consider using column-level privileges or UPDATE triggers for additional protection
+- [Supabase RLS Column Policies](https://supabase.com/docs/guides/auth/row-level-security)
+
+> [!CAUTION]
+> **Lesson learned**: "RLS enabled" ≠ "RLS properly configured". Always test what authenticated users can actually modify.
+
+---
+
 ### 2025-12-26 - wiki-guesser - Session Handoff & Features
 
 **Status:** ALL GREEN
